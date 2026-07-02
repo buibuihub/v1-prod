@@ -8,7 +8,7 @@ import urllib.error
 from pathlib import Path
 from ytmusicapi import YTMusic
 
-yt = YTMusic()
+yt = None 
 ROOT_DIR = Path(__file__).resolve().parent
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
