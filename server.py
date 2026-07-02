@@ -94,7 +94,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({'status': 'ok'})
             return
 
-            if parsed.path == '/search':
+        if parsed.path == '/search':
             global yt
             if yt is None:
                 yt = YTMusic()
