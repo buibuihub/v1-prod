@@ -94,11 +94,14 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({'status': 'ok'})
             return
 
-        if parsed.path == '/search':
+            if parsed.path == '/search':
+            global yt
+            if yt is None:
+                yt = YTMusic()
+
             query = parse_qs(parsed.query).get('q', [''])[0].strip()
-            if not query:
-                self.send_json({'error': 'Missing query'}, status=400)
-                return
+            # ... rest of your code exactly as it is ...
+            
 
             try:
                 results = yt.search(query, filter='songs', limit=5)
