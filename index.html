@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#030305" />
     <title>NovaOS v4.0 • Cognitive SaaS Command Center</title>
     <script src="https://cdn.tailwindcss.com">
@@ -24,8 +24,6 @@
             --radius-md: 18px;
             --blur-intensity: blur(28px) saturate(170%);
             --ui-scale: 1rem;
-            --glow-color: rgba(139, 92, 246, 0.25);
-            --particle-color: rgba(139, 92, 246, 0.5);
         }
 
         * {
@@ -42,1106 +40,259 @@
             overflow-x: hidden;
             font-size: var(--ui-scale);
             transition: background-color 0.8s cubic-bezier(0.25, 0.8, 0.25, 1);
-            cursor: default;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .font-display {
-            font-family: "Space Grotesk", sans-serif;
-        }
+        .font-display { font-family: "Space Grotesk", sans-serif; }
 
         /* ── Canvas Particle Layer ── */
         #particle-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            pointer-events: none;
-            opacity: 0.55;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1; pointer-events: none; opacity: 0.55;
         }
 
-        /* ── Ambient Background Spheres ── */
+        /* ── Ambient Background ── */
         .ambient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -3;
-            overflow: hidden;
-            background: var(--bg-base);
-            transition: background 1s ease;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -3; overflow: hidden; background: var(--bg-base); transition: background 1s ease;
         }
-
         .sphere {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(130px);
-            opacity: 0.30;
+            position: absolute; border-radius: 50%; filter: blur(130px); opacity: 0.30;
             transition: background 1.2s ease, transform 1s ease, opacity 1s ease;
         }
+        .sphere-1 { width: 650px; height: 650px; top: -12%; left: 8%; background: var(--accent); animation: float1 28s infinite alternate ease-in-out; }
+        .sphere-2 { width: 750px; height: 750px; bottom: -18%; right: 8%; background: #06b6d4; animation: float2 32s infinite alternate ease-in-out; }
+        .sphere-3 { width: 550px; height: 550px; top: 30%; left: 52%; background: #ec4899; animation: float3 26s infinite alternate ease-in-out; }
+        @keyframes float1 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(140px,90px) scale(1.2); } }
+        @keyframes float2 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-160px,-110px) scale(0.85); } }
+        @keyframes float3 { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(-90px,130px) scale(1.25); } }
 
-        .sphere-1 {
-            width: 650px;
-            height: 650px;
-            top: -12%;
-            left: 8%;
-            background: var(--accent);
-            animation: float1 28s infinite alternate ease-in-out;
-        }
-        .sphere-2 {
-            width: 750px;
-            height: 750px;
-            bottom: -18%;
-            right: 8%;
-            background: #06b6d4;
-            animation: float2 32s infinite alternate ease-in-out;
-        }
-        .sphere-3 {
-            width: 550px;
-            height: 550px;
-            top: 30%;
-            left: 52%;
-            background: #ec4899;
-            animation: float3 26s infinite alternate ease-in-out;
-        }
-
-        @keyframes float1 {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                transform: translate(140px, 90px) scale(1.2);
-            }
-        }
-        @keyframes float2 {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                transform: translate(-160px, -110px) scale(0.85);
-            }
-        }
-        @keyframes float3 {
-            0% {
-                transform: translate(0, 0) scale(1);
-            }
-            100% {
-                transform: translate(-90px, 130px) scale(1.25);
-            }
-        }
-
-        /* ── Noise Overlay ── */
         .ambient-noise {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
             pointer-events: none;
         }
 
-        /* ── Glassmorphism System ── */
+        /* ── Glassmorphism ── */
         .glass-panel {
-            background: var(--panel-bg);
-            backdrop-filter: var(--blur-intensity);
+            background: var(--panel-bg); backdrop-filter: var(--blur-intensity);
             -webkit-backdrop-filter: var(--blur-intensity);
-            border: 1px solid var(--panel-border);
-            border-radius: var(--radius-lg);
-            box-shadow: 0 16px 50px -12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.04);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-                box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
+            border: 1px solid var(--panel-border); border-radius: var(--radius-lg);
+            box-shadow: 0 16px 50px -12px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.04);
+            transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), border-color 0.5s, box-shadow 0.5s;
+            position: relative; overflow: hidden;
         }
-
         .glass-panel::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: var(--radius-lg);
-            padding: 2px;
-            background: conic-gradient(from var(--angle, 0deg),
-                    transparent,
-                    var(--accent),
-                    transparent,
-                    var(--accent),
-                    transparent);
+            content: ''; position: absolute; inset: -2px; border-radius: var(--radius-lg); padding: 2px;
+            background: conic-gradient(from var(--angle,0deg), transparent, var(--accent), transparent, var(--accent), transparent);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.6s ease;
-            animation: rotateBorder 6s linear infinite;
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; opacity: 0;
+            transition: opacity 0.6s ease; animation: rotateBorder 6s linear infinite;
         }
-
-        .glass-panel:hover::before {
-            opacity: 0.5;
-        }
-
-        @property --angle {
-            syntax: '<angle>';
-            initial-value: 0deg;
-            inherits: false;
-        }
-        @keyframes rotateBorder {
-            to {
-                --angle: 360deg;
-            }
-        }
-
-        .glass-panel:hover {
-            border-color: rgba(255, 255, 255, 0.18);
-            box-shadow: 0 28px 70px -16px rgba(0, 0, 0, 0.7), 0 0 40px var(--accent-glow);
-            transform: translateY(-3px) scale(1.005);
-        }
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        @keyframes rotateBorder { to { --angle: 360deg; } }
+        .glass-panel:hover { border-color: rgba(255,255,255,0.18); box-shadow: 0 28px 70px -16px rgba(0,0,0,0.7), 0 0 40px var(--accent-glow); transform: translateY(-3px) scale(1.005); }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-md);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: var(--radius-md);
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1); position: relative; overflow: hidden;
         }
-
-        .glass-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent 40%, rgba(139, 92, 246, 0.06) 60%, transparent 80%);
-            transform: translateX(-100%);
-            transition: transform 0.8s ease;
-            pointer-events: none;
-        }
-
-        .glass-card:hover::after {
-            transform: translateX(100%);
-        }
-
-        .glass-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.14);
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.4);
-        }
+        .glass-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.14); transform: translateY(-4px) scale(1.01); }
 
         /* ── Typography ── */
-        .text-gradient {
-            background: linear-gradient(135deg, #ffffff 30%, var(--text-muted) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .text-glow {
-            text-shadow: 0 0 30px var(--accent-glow);
-        }
+        .text-gradient { background: linear-gradient(135deg, #ffffff 30%, var(--text-muted) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-glow { text-shadow: 0 0 30px var(--accent-glow); }
 
         /* ── Inputs ── */
-        .input-base {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 14px;
-            color: #ffffff;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .input-base:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px var(--accent-glow), 0 0 30px var(--accent-glow);
-            transform: scale(1.01);
-        }
+        .input-base { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; color: #ffffff; transition: all 0.4s; }
+        .input-base:focus { outline: none; background: rgba(255,255,255,0.08); border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); transform: scale(1.01); }
 
-        /* ── Premium Button ── */
-        .btn-accent {
-            background: var(--accent);
-            color: white;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 8px 28px -6px var(--accent-glow);
-            position: relative;
-            overflow: hidden;
-            border: none;
-            cursor: pointer;
-        }
-        .btn-accent::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-            transition: all 0.7s ease;
-        }
-        .btn-accent:hover::after {
-            left: 100%;
-        }
-        .btn-accent:hover {
-            filter: brightness(1.18);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 14px 34px -4px var(--accent-glow);
-        }
-        .btn-accent:active {
-            transform: translateY(1px) scale(0.98);
-        }
+        /* ── Buttons ── */
+        .btn-accent { background: var(--accent); color: white; transition: all 0.4s; box-shadow: 0 8px 28px -6px var(--accent-glow); position: relative; overflow: hidden; border: none; cursor: pointer; touch-action: manipulation; }
+        .btn-accent::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent); transition: all 0.7s ease; }
+        .btn-accent:hover::after { left: 100%; }
+        .btn-accent:hover { filter: brightness(1.18); transform: translateY(-2px) scale(1.02); box-shadow: 0 14px 34px -4px var(--accent-glow); }
+        .btn-accent:active { transform: translateY(1px) scale(0.98); }
 
-        /* ── Magnetic Button Wrapper ── */
-        .magnetic-wrap {
-            display: inline-block;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        .magnetic-wrap { display: inline-block; transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1); }
 
         /* ── Dock ── */
         .dock-container {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(10, 10, 15, 0.6);
-            backdrop-filter: blur(36px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 28px;
-            padding: 8px 14px;
-            z-index: 90;
-            box-shadow: 0 24px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(139, 92, 246, 0.05);
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: rgba(10,10,15,0.6); backdrop-filter: blur(36px) saturate(150%);
+            border: 1px solid rgba(255,255,255,0.07); border-radius: 28px; padding: 8px 14px;
+            z-index: 90; box-shadow: 0 24px 50px -12px rgba(0,0,0,0.7), 0 0 40px rgba(139,92,246,0.05);
+            display: flex; gap: 6px; align-items: center; transition: all 0.5s;
         }
-        .dock-container:hover {
-            box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.8), 0 0 60px var(--accent-glow);
-        }
+        .dock-item { width: 48px; height: 48px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #94a3b8; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.03); cursor: pointer; position: relative; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); touch-action: manipulation; }
+        .dock-item:hover { transform: translateY(-12px) scale(1.22); color: #ffffff; background: var(--accent); border-color: rgba(255,255,255,0.25); box-shadow: 0 12px 28px var(--accent-glow); }
+        .dock-tooltip { position: absolute; bottom: 62px; background: rgba(0,0,0,0.88); color: white; font-size: 10px; padding: 5px 10px; border-radius: 8px; opacity: 0; pointer-events: none; transform: scale(0.85) translateY(6px); transition: all 0.3s; white-space: nowrap; border: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(12px); }
+        .dock-item:hover .dock-tooltip { opacity: 1; transform: scale(1) translateY(0); }
 
-        .dock-item {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.03);
-            cursor: pointer;
-            position: relative;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .dock-item:hover {
-            transform: translateY(-12px) scale(1.22);
-            color: #ffffff;
-            background: var(--accent);
-            border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 12px 28px var(--accent-glow);
-        }
-        .dock-tooltip {
-            position: absolute;
-            bottom: 62px;
-            background: rgba(0, 0, 0, 0.88);
-            color: white;
-            font-size: 10px;
-            padding: 5px 10px;
-            border-radius: 8px;
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.85) translateY(6px);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            white-space: nowrap;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(12px);
-        }
-        .dock-item:hover .dock-tooltip {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-
-        /* ── Notch Search ── */
+        /* ── Notch ── */
         .notch {
-            position: fixed;
-            top: 18px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(40px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 34px;
-            padding: 8px 22px;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            width: 340px;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(139, 92, 246, 0.03);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(40px) saturate(160%);
+            border: 1px solid rgba(255,255,255,0.10); border-radius: 34px; padding: 8px 22px;
+            z-index: 100; display: flex; align-items: center; gap: 14px; width: 340px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 30px rgba(139,92,246,0.03);
+            transition: all 0.5s;
         }
-        .notch:focus-within {
-            width: 520px;
-            border-radius: 22px;
-            background: rgba(15, 15, 22, 0.96);
-            border-color: var(--accent);
-            box-shadow: 0 18px 50px var(--accent-glow), 0 0 60px rgba(139, 92, 246, 0.08);
-        }
+        .notch:focus-within { width: 520px; border-radius: 22px; background: rgba(15,15,22,0.96); border-color: var(--accent); box-shadow: 0 18px 50px var(--accent-glow); }
 
-        /* ── Scrollbar ── */
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.25);
-        }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
-        /* ── Custom Range ── */
-        input[type=range] {
-            -webkit-appearance: none;
-            background: rgba(255, 255, 255, 0.08);
-            height: 5px;
-            border-radius: 3px;
-            outline: none;
-            transition: background 0.3s ease;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: var(--accent);
-            cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-            box-shadow: 0 0 16px var(--accent-glow);
-        }
-        input[type=range]::-webkit-slider-thumb:hover {
-            transform: scale(1.35);
-            box-shadow: 0 0 30px var(--accent-glow);
-        }
+        input[type=range] { -webkit-appearance: none; background: rgba(255,255,255,0.08); height: 5px; border-radius: 3px; outline: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; transition: transform 0.2s; box-shadow: 0 0 16px var(--accent-glow); }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.35); }
 
-        /* ── Toast ── */
-        #toast-container {
-            position: fixed;
-            bottom: 90px;
-            right: 24px;
-            z-index: 999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .toast {
-            background: rgba(15, 15, 22, 0.92);
-            border: 1px solid var(--accent);
-            backdrop-filter: blur(20px) saturate(150%);
-            padding: 14px 24px;
-            border-radius: 16px;
-            font-size: 0.85rem;
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6), 0 0 30px var(--accent-glow);
-            animation: slideIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            min-width: 220px;
-        }
-        .toast .icon {
-            font-size: 1.2rem;
-            color: var(--accent);
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.92) rotate(-2deg);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1) rotate(0deg);
-            }
-        }
+        #toast-container { position: fixed; bottom: 90px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: rgba(15,15,22,0.92); border: 1px solid var(--accent); backdrop-filter: blur(20px); padding: 14px 24px; border-radius: 16px; font-size: 0.85rem; box-shadow: 0 14px 40px rgba(0,0,0,0.6); animation: slideIn 0.5s forwards; display: flex; align-items: center; gap: 12px; min-width: 220px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(30px) scale(0.92); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-        /* ── Reveal / Stagger ── */
-        .reveal-item {
-            opacity: 0;
-            transform: translateY(40px) scale(0.96);
-            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .reveal-item.revealed {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-        .reveal-item:nth-child(1) {
-            transition-delay: 0.05s;
-        }
-        .reveal-item:nth-child(2) {
-            transition-delay: 0.10s;
-        }
-        .reveal-item:nth-child(3) {
-            transition-delay: 0.15s;
-        }
-        .reveal-item:nth-child(4) {
-            transition-delay: 0.20s;
-        }
-        .reveal-item:nth-child(5) {
-            transition-delay: 0.25s;
-        }
-        .reveal-item:nth-child(6) {
-            transition-delay: 0.30s;
-        }
+        .reveal-item { opacity: 0; transform: translateY(40px) scale(0.96); transition: opacity 0.9s, transform 0.9s; }
+        .reveal-item.revealed { opacity: 1; transform: translateY(0) scale(1); }
+        .reveal-item:nth-child(1) { transition-delay: 0.05s; } .reveal-item:nth-child(2) { transition-delay: 0.10s; } .reveal-item:nth-child(3) { transition-delay: 0.15s; } .reveal-item:nth-child(4) { transition-delay: 0.20s; } .reveal-item:nth-child(5) { transition-delay: 0.25s; } .reveal-item:nth-child(6) { transition-delay: 0.30s; }
 
-        /* ── Vinyl Disk ── */
-        .disk-container {
-            width: 140px;
-            height: 140px;
-            border-radius: 50%;
-            border: 4px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6), 0 0 30px var(--accent-glow);
-            position: relative;
-            animation: rotateDisk 18s linear infinite;
-            animation-play-state: paused;
-        }
-        .disk-container.playing {
-            animation-play-state: running;
-        }
-        .disk-vinyl-lines {
-            position: absolute;
-            inset: 8px;
-            border-radius: 50%;
-            border: 2px dashed rgba(255, 255, 255, 0.06);
-        }
-        .disk-art {
-            position: absolute;
-            inset: 22px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.08);
-        }
-        .disk-center {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--bg-base);
-            border: 3px solid var(--accent);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10;
-        }
-        @keyframes rotateDisk {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
+        .disk-container { width: 140px; height: 140px; border-radius: 50%; border: 4px solid rgba(255,255,255,0.05); box-shadow: 0 0 40px rgba(0,0,0,0.6), 0 0 30px var(--accent-glow); position: relative; animation: rotateDisk 18s linear infinite; animation-play-state: paused; }
+        .disk-container.playing { animation-play-state: running; }
+        .disk-vinyl-lines { position: absolute; inset: 8px; border-radius: 50%; border: 2px dashed rgba(255,255,255,0.06); }
+        .disk-art { position: absolute; inset: 22px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.08); }
+        .disk-center { position: absolute; width: 20px; height: 20px; border-radius: 50%; background: var(--bg-base); border: 3px solid var(--accent); top: 50%; left: 50%; transform: translate(-50%,-50%); z-index: 10; }
+        @keyframes rotateDisk { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* ── Equalizer ── */
-        .eq-bar {
-            height: 20%;
-            transition: height 0.15s ease;
-        }
-        .eq-playing .eq-bar {
-            animation: eq-bounce 0.8s ease-in-out infinite alternate;
-        }
-        .eq-playing .eq-bar:nth-child(1) {
-            animation-duration: 0.5s;
-        }
-        .eq-playing .eq-bar:nth-child(2) {
-            animation-duration: 0.8s;
-        }
-        .eq-playing .eq-bar:nth-child(3) {
-            animation-duration: 0.6s;
-        }
-        .eq-playing .eq-bar:nth-child(4) {
-            animation-duration: 0.9s;
-        }
-        .eq-playing .eq-bar:nth-child(5) {
-            animation-duration: 0.7s;
-        }
-        @keyframes eq-bounce {
-            0% {
-                height: 10%;
-            }
-            100% {
-                height: 100%;
-            }
-        }
+        .eq-bar { height: 20%; transition: height 0.15s ease; }
+        .eq-playing .eq-bar { animation: eq-bounce 0.8s ease-in-out infinite alternate; }
+        .eq-playing .eq-bar:nth-child(1) { animation-duration: 0.5s; } .eq-playing .eq-bar:nth-child(2) { animation-duration: 0.8s; } .eq-playing .eq-bar:nth-child(3) { animation-duration: 0.6s; } .eq-playing .eq-bar:nth-child(4) { animation-duration: 0.9s; } .eq-playing .eq-bar:nth-child(5) { animation-duration: 0.7s; }
+        @keyframes eq-bounce { 0% { height: 10%; } 100% { height: 100%; } }
 
-        /* ── PIP ── */
-        .video-pip-container {
-            position: fixed;
-            bottom: 110px;
-            right: 24px;
-            width: 340px;
-            background: rgba(10, 10, 15, 0.88);
-            backdrop-filter: blur(30px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            border-radius: 18px;
-            z-index: 100;
-            box-shadow: 0 34px 70px -18px rgba(0, 0, 0, 0.8), 0 0 50px rgba(139, 92, 246, 0.04);
-            transition: transform 0.3s ease, width 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-        }
-        .video-pip-container.minimized {
-            width: 180px;
-        }
-        .video-pip-container.minimized .video-wrapper {
-            display: none;
-        }
-        .video-wrapper iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
+        .video-pip-container { position: fixed; bottom: 110px; right: 24px; width: 340px; background: rgba(10,10,15,0.88); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.10); border-radius: 18px; z-index: 100; box-shadow: 0 34px 70px -18px rgba(0,0,0,0.8); transition: transform 0.3s, width 0.4s; }
+        .video-pip-container.minimized { width: 180px; }
+        .video-pip-container.minimized .video-wrapper { display: none; }
+        .video-wrapper iframe { width: 100%; height: 100%; border: none; }
 
-        /* ── Perspective ── */
-        .perspective-container {
-            perspective: 1800px;
-        }
-        .perspective-card {
-            transform-style: preserve-3d;
-            transform: rotateX(6deg) rotateY(-2deg) scale(0.96);
-            transition: transform 0.2s ease-out;
-        }
+        .perspective-container { perspective: 1800px; }
+        .perspective-card { transform-style: preserve-3d; transform: rotateX(6deg) rotateY(-2deg) scale(0.96); transition: transform 0.2s ease-out; }
 
-        /* ── 3D Tilt Cards ── */
-        .tilt-card {
-            transition: transform 0.15s ease-out;
-            transform-style: preserve-3d;
-        }
+        .tilt-card { transition: transform 0.15s ease-out; transform-style: preserve-3d; will-change: transform; }
 
-        /* ── Glow Pulse ── */
-        .glow-pulse {
-            animation: glowPulse 2.5s ease-in-out infinite;
-        }
-        @keyframes glowPulse {
-            0%,
-            100% {
-                box-shadow: 0 0 20px var(--accent-glow);
-            }
-            50% {
-                box-shadow: 0 0 50px var(--accent-glow), 0 0 80px rgba(139, 92, 246, 0.08);
-            }
-        }
+        .glow-pulse { animation: glowPulse 2.5s ease-in-out infinite; }
+        @keyframes glowPulse { 0%,100% { box-shadow: 0 0 20px var(--accent-glow); } 50% { box-shadow: 0 0 50px var(--accent-glow), 0 0 80px rgba(139,92,246,0.08); } }
 
-        /* ── Floating Particles (icons) ── */
-        .floating-particle {
-            position: fixed;
-            pointer-events: none;
-            z-index: 0;
-            font-size: 1.4rem;
-            opacity: 0.10;
-            animation: floatParticle 20s infinite linear;
-        }
-        @keyframes floatParticle {
-            0% {
-                transform: translateY(100vh) rotate(0deg) scale(0.5);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.12;
-            }
-            90% {
-                opacity: 0.12;
-            }
-            100% {
-                transform: translateY(-10vh) rotate(720deg) scale(1.2);
-                opacity: 0;
-            }
-        }
+        .floating-particle { position: fixed; pointer-events: none; z-index: 0; font-size: 1.4rem; opacity: 0.10; animation: floatParticle 20s infinite linear; }
+        @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg) scale(0.5); opacity: 0; } 10% { opacity: 0.12; } 90% { opacity: 0.12; } 100% { transform: translateY(-10vh) rotate(720deg) scale(1.2); opacity: 0; } }
 
-        /* ── Mouse Glow Trail ── */
-        #glow-trail {
-            position: fixed;
-            pointer-events: none;
-            z-index: 9999;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(139, 92, 246, 0.06) 0%, transparent 70%);
-            transform: translate(-50%, -50%);
-            transition: left 0.08s ease-out, top 0.08s ease-out;
-            opacity: 0;
-            will-change: left, top;
-        }
-        #glow-trail.active {
-            opacity: 1;
-        }
+        #glow-trail { position: fixed; pointer-events: none; z-index: 9999; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%); transform: translate(-50%,-50%); transition: left 0.08s, top 0.08s; opacity: 0; }
+        #glow-trail.active { opacity: 1; }
 
-        /* ── 3D Carousel ── */
-        .carousel-3d {
-            perspective: 1200px;
-            height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .carousel-track {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            animation: carouselSpin 28s infinite linear;
-        }
-        .carousel-item {
-            position: absolute;
-            width: 160px;
-            height: 120px;
-            border-radius: 18px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 12px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .carousel-item:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 40px var(--accent-glow);
-            transform: scale(1.08) !important;
-        }
-        .carousel-item i {
-            font-size: 1.8rem;
-            color: var(--accent);
-            margin-bottom: 6px;
-        }
-        .carousel-item span {
-            font-size: 0.7rem;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-        @keyframes carouselSpin {
-            0% {
-                transform: rotateY(0deg);
-            }
-            100% {
-                transform: rotateY(360deg);
-            }
-        }
+        .carousel-3d { perspective: 1200px; height: 220px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .carousel-track { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; animation: carouselSpin 28s infinite linear; }
+        .carousel-item { position: absolute; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); backdrop-filter: blur(12px); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.3); transition: all 0.3s; cursor: pointer; width: 160px; height: 120px; }
+        .carousel-item:hover { border-color: var(--accent); box-shadow: 0 0 40px var(--accent-glow); transform: scale(1.08) !important; }
+        .carousel-item i { font-size: 1.8rem; color: var(--accent); margin-bottom: 6px; }
+        .carousel-item span { font-size: 0.7rem; font-weight: 600; color: #e2e8f0; }
+        @keyframes carouselSpin { 0% { transform: rotateY(0deg); } 100% { transform: rotateY(360deg); } }
 
-        /* ── Animated Counter ── */
-        .stat-counter {
-            font-family: "Space Grotesk", sans-serif;
-            font-size: 2.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-        }
+        .stat-counter { font-family: "Space Grotesk", sans-serif; font-size: 2.8rem; font-weight: 700; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1; }
+        .shimmer { background: linear-gradient(90deg, rgba(255,255,255,0.02) 25%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.02) 75%); background-size: 200% 100%; animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-        /* ── Shimmer Skeleton ── */
-        .shimmer {
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.02) 25%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.02) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
-        @keyframes shimmer {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
+        .game-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: var(--radius-md); padding: 16px; transition: all 0.4s; cursor: default; min-height: 200px; display: flex; flex-direction: column; }
+        .game-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.12); transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 30px -8px rgba(0,0,0,0.4); }
+        .game-card .game-title { font-family: "Space Grotesk", sans-serif; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .game-card .game-title i { color: var(--accent); }
+        .game-card .game-body { flex: 1; display: flex; flex-direction: column; gap: 8px; justify-content: center; align-items: center; }
+        .game-card .game-body .game-value { font-size: 2rem; font-weight: 700; font-family: "Space Grotesk", sans-serif; background: linear-gradient(135deg, #fff, var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .game-card .game-body .game-btn { background: var(--accent); color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 16px var(--accent-glow); touch-action: manipulation; }
+        .game-card .game-body .game-btn:hover { transform: scale(1.06); filter: brightness(1.15); }
+        .game-card .game-body .game-btn.secondary { background: rgba(255,255,255,0.08); box-shadow: none; color: #cbd5e1; }
+        .game-card .game-body .game-btn.secondary:hover { background: rgba(255,255,255,0.15); color: white; }
+        .game-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-top: 4px; }
+        .game-progress .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.4s; box-shadow: 0 0 12px var(--accent-glow); }
+        .game-choices { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .game-choices .choice-btn { padding: 4px 12px; border-radius: 16px; font-size: 0.65rem; font-weight: 600; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer; transition: all 0.3s; touch-action: manipulation; }
+        .game-choices .choice-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.05); }
+        .game-result { font-size: 0.8rem; text-align: center; color: #94a3b8; padding: 4px 8px; border-radius: 8px; background: rgba(255,255,255,0.03); min-height: 2em; }
+        .game-result.highlight { color: #e2e8f0; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.15); }
+        .game-feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; width: 100%; max-width: 240px; }
+        .game-feature-grid .feat { padding: 4px 6px; border-radius: 8px; font-size: 0.6rem; text-align: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: all 0.3s; color: #94a3b8; touch-action: manipulation; }
+        .game-feature-grid .feat:hover { background: rgba(139,92,246,0.15); border-color: var(--accent); color: white; }
+        .game-feature-grid .feat.selected { background: var(--accent); border-color: var(--accent); color: white; box-shadow: 0 0 16px var(--accent-glow); }
 
-        /* ── Responsive ── */
-        @media (max-width: 768px) {
-            .notch {
-                width: 260px;
-                padding: 6px 14px;
-            }
-            .notch:focus-within {
-                width: 320px;
-            }
-            .dock-container {
-                gap: 4px;
-                padding: 6px 10px;
-            }
-            .dock-item {
-                width: 40px;
-                height: 40px;
-                font-size: 0.9rem;
-            }
-            .video-pip-container {
-                width: 260px;
-                right: 12px;
-                bottom: 90px;
-            }
-            .stat-counter {
-                font-size: 2rem;
-            }
-            .carousel-item {
-                width: 120px;
-                height: 100px;
-            }
-        }
+        .tower-stack { display: flex; flex-direction: column-reverse; align-items: center; gap: 2px; height: 80px; width: 100%; max-width: 120px; margin: 0 auto; padding: 4px 0; overflow: hidden; position: relative; }
+        .tower-stack .block { width: 70%; height: 8px; border-radius: 3px; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); transition: all 0.2s; opacity: 0.7; animation: blockPop 0.3s; }
+        @keyframes blockPop { 0% { transform: scaleY(0); opacity: 0; } 100% { transform: scaleY(1); opacity: 0.7; } }
+        .tower-stack .block:nth-child(odd) { background: #a78bfa; } .tower-stack .block:nth-child(3n) { background: #06b6d4; } .tower-stack .block:nth-child(5n+2) { background: #ec4899; }
 
-        /* ── Mini‑Games Arcade Styles ── */
-        .game-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: default;
-            min-height: 200px;
-            display: flex;
-            flex-direction: column;
-        }
-        .game-card:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.12);
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.4);
-        }
-        .game-card .game-title {
-            font-family: "Space Grotesk", sans-serif;
-            font-weight: 600;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-        }
-        .game-card .game-title i {
-            color: var(--accent);
-        }
-        .game-card .game-body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            justify-content: center;
-            align-items: center;
-        }
-        .game-card .game-body .game-value {
-            font-size: 2rem;
-            font-weight: 700;
-            font-family: "Space Grotesk", sans-serif;
-            background: linear-gradient(135deg, #fff, var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .game-card .game-body .game-btn {
-            background: var(--accent);
-            color: white;
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 16px var(--accent-glow);
-        }
-        .game-card .game-body .game-btn:hover {
-            transform: scale(1.06);
-            filter: brightness(1.15);
-        }
-        .game-card .game-body .game-btn:active {
-            transform: scale(0.95);
-        }
-        .game-card .game-body .game-btn.secondary {
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: none;
-            color: #cbd5e1;
-        }
-        .game-card .game-body .game-btn.secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-        }
-        .game-progress {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 4px;
-        }
-        .game-progress .progress-fill {
-            height: 100%;
-            background: var(--accent);
-            border-radius: 4px;
-            transition: width 0.4s ease;
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-        .game-choices {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .game-choices .choice-btn {
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #cbd5e1;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .game-choices .choice-btn:hover {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            transform: scale(1.05);
-        }
-        .game-choices .choice-btn:active {
-            transform: scale(0.95);
-        }
-        .game-result {
-            font-size: 0.8rem;
-            text-align: center;
-            color: #94a3b8;
-            padding: 4px 8px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.03);
-            min-height: 2em;
-        }
-        .game-result.highlight {
-            color: #e2e8f0;
-            background: rgba(139, 92, 246, 0.12);
-            border: 1px solid rgba(139, 92, 246, 0.15);
-        }
-        .game-feature-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            width: 100%;
-            max-width: 240px;
-        }
-        .game-feature-grid .feat {
-            padding: 4px 6px;
-            border-radius: 8px;
-            font-size: 0.6rem;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #94a3b8;
-        }
-        .game-feature-grid .feat:hover {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: var(--accent);
-            color: white;
-        }
-        .game-feature-grid .feat.selected {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-            box-shadow: 0 0 16px var(--accent-glow);
-        }
+        .trolley-scenario { font-size: 0.8rem; text-align: center; color: #e2e8f0; padding: 4px 8px; min-height: 2.4em; font-weight: 500; }
+        .trolley-options { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .trolley-options .trolley-btn { padding: 6px 14px; border-radius: 20px; font-size: 0.65rem; font-weight: 600; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); color: #cbd5e1; cursor: pointer; transition: all 0.3s; touch-action: manipulation; }
+        .trolley-options .trolley-btn:hover { background: var(--accent); color: white; border-color: var(--accent); transform: scale(1.05); }
+        .trolley-options .trolley-btn.left { border-color: rgba(239,68,68,0.3); color: #fca5a5; }
+        .trolley-options .trolley-btn.left:hover { background: #ef4444; border-color: #ef4444; color: white; }
+        .trolley-options .trolley-btn.right { border-color: rgba(34,197,94,0.3); color: #86efac; }
+        .trolley-options .trolley-btn.right:hover { background: #22c55e; border-color: #22c55e; color: white; }
 
-        /* Tower builder animation */
-        .tower-stack {
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            gap: 2px;
-            height: 80px;
-            width: 100%;
-            max-width: 120px;
-            margin: 0 auto;
-            padding: 4px 0;
-            overflow: hidden;
-            position: relative;
-        }
-        .tower-stack .block {
-            width: 70%;
-            height: 8px;
-            border-radius: 3px;
-            background: var(--accent);
-            box-shadow: 0 0 8px var(--accent-glow);
-            transition: all 0.2s ease;
-            opacity: 0.7;
-            animation: blockPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        @keyframes blockPop {
-            0% {
-                transform: scaleY(0);
-                opacity: 0;
-            }
-            100% {
-                transform: scaleY(1);
-                opacity: 0.7;
-            }
-        }
-        .tower-stack .block:nth-child(odd) {
-            background: #a78bfa;
-        }
-        .tower-stack .block:nth-child(3n) {
-            background: #06b6d4;
-        }
-        .tower-stack .block:nth-child(5n+2) {
-            background: #ec4899;
-        }
+        .clicker-score { font-size: 2.8rem; font-weight: 700; font-family: "Space Grotesk", sans-serif; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .clicker-upgrades { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+        .clicker-upgrades .upgrade-btn { padding: 2px 10px; border-radius: 12px; font-size: 0.55rem; font-weight: 600; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06); color: #94a3b8; cursor: pointer; transition: all 0.3s; touch-action: manipulation; }
+        .clicker-upgrades .upgrade-btn:hover { background: rgba(139,92,246,0.15); border-color: var(--accent); color: white; }
+        .clicker-upgrades .upgrade-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
-        /* Absurd trolley */
-        .trolley-scenario {
-            font-size: 0.8rem;
-            text-align: center;
-            color: #e2e8f0;
-            padding: 4px 8px;
-            min-height: 2.4em;
-            font-weight: 500;
-        }
-        .trolley-options {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .trolley-options .trolley-btn {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #cbd5e1;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .trolley-options .trolley-btn:hover {
-            background: var(--accent);
-            color: white;
-            border-color: var(--accent);
-            transform: scale(1.05);
-        }
-        .trolley-options .trolley-btn:active {
-            transform: scale(0.95);
-        }
-        .trolley-options .trolley-btn.left {
-            border-color: rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
-        }
-        .trolley-options .trolley-btn.left:hover {
-            background: #ef4444;
-            border-color: #ef4444;
-            color: white;
-        }
-        .trolley-options .trolley-btn.right {
-            border-color: rgba(34, 197, 94, 0.3);
-            color: #86efac;
-        }
-        .trolley-options .trolley-btn.right:hover {
-            background: #22c55e;
-            border-color: #22c55e;
-            color: white;
-        }
+        .password-strength-bar { width: 100%; height: 5px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+        .password-strength-bar .strength-fill { height: 100%; border-radius: 4px; transition: width 0.4s, background 0.4s; width: 0%; }
+        .password-strength-label { font-size: 0.7rem; font-weight: 600; text-align: center; min-height: 1.6em; }
 
-        /* Clicker */
-        .clicker-score {
-            font-size: 2.8rem;
-            font-weight: 700;
-            font-family: "Space Grotesk", sans-serif;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .clicker-upgrades {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .clicker-upgrades .upgrade-btn {
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 0.55rem;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: #94a3b8;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .clicker-upgrades .upgrade-btn:hover {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: var(--accent);
-            color: white;
-        }
-        .clicker-upgrades .upgrade-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        .clicker-upgrades .upgrade-btn:disabled:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.06);
-            color: #94a3b8;
-            transform: none;
-        }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
 
-        /* Password strength */
-        .password-strength-bar {
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 4px;
-            overflow: hidden;
+        /* ═══════ MOBILE SPECIFIC (FIXES 412x915 & similar) ═══════ */
+        @media (max-width: 460px) {
+            body { font-size: 14px; }
+            .perspective-container { perspective: 800px; }
+            .perspective-card { transform: none !important; } /* Flatten 3D to prevent clipping */
+            .glass-panel { padding: 14px !important; border-radius: 16px !important; }
+            .notch { width: 92% !important; max-width: 320px !important; padding: 4px 10px !important; gap: 8px !important; }
+            .notch:focus-within { width: 96% !important; max-width: 340px !important; }
+            .notch input { font-size: 14px !important; }
+            #search-results { max-height: 140px !important; font-size: 11px !important; }
+            #hero-banner { grid-template-columns: 1fr !important; gap: 12px !important; }
+            #hero-banner h1 { font-size: 2.2rem !important; line-height: 1.1 !important; }
+            #hero-content, #hero-preview { padding: 16px !important; }
+            main.perspective-card { display: flex !important; flex-direction: column !important; gap: 12px !important; }
+            .lg\:col-span-7, .lg\:col-span-5 { width: 100% !important; max-width: 100% !important; }
+            .carousel-3d { height: 150px !important; }
+            .carousel-item { width: 60px !important; height: 60px !important; padding: 6px !important; }
+            .carousel-item i { font-size: 1.2rem !important; margin-bottom: 2px !important; }
+            .carousel-item span { font-size: 0.4rem !important; }
+            .video-pip-container { width: 130px !important; right: 6px !important; bottom: 70px !important; border-radius: 12px !important; }
+            .video-pip-container .video-wrapper { border-radius: 6px !important; }
+            .dock-container { gap: 2px !important; padding: 4px 6px !important; bottom: 12px !important; border-radius: 16px !important; }
+            .dock-item { width: 32px !important; height: 32px !important; font-size: 0.65rem !important; border-radius: 10px !important; }
+            #media-tab-player { flex-direction: column !important; align-items: center !important; }
+            .disk-container { width: 80px !important; height: 80px !important; }
+            .disk-art { inset: 12px !important; }
+            .media-controls { flex-wrap: wrap !important; justify-content: center !important; gap: 6px !important; }
+            .games-grid { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+            .game-card { padding: 10px !important; min-height: 140px !important; }
+            .game-card .game-value, .clicker-score { font-size: 1.4rem !important; }
+            #task-title, select { width: 100% !important; margin-bottom: 4px; }
+            .task-board-inputs { display: flex !important; flex-direction: column !important; gap: 4px !important; }
+            #ai-chat { height: 380px !important; }
+            .tower-stack { height: 50px !important; }
+            .stat-counter { font-size: 1.8rem !important; }
+            .hero-stats { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+            .settings-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+            .glass-card { border-radius: 12px !important; }
+            .p-10, .p-8 { padding: 1rem !important; }
+            .gap-8 { gap: 12px !important; }
+            .mt-8 { margin-top: 12px !important; }
+            #music-title { font-size: 1rem !important; }
+            #music-artist { font-size: 0.7rem !important; }
+            .trolley-options .trolley-btn { font-size: 0.55rem !important; padding: 4px 10px !important; }
         }
-        .password-strength-bar .strength-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.4s ease, background 0.4s ease;
-            width: 0%;
-        }
-        .password-strength-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-align: center;
-            min-height: 1.6em;
-        }
-
-        /* ── Game grid responsive ── */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 16px;
-        }
-        @media (max-width: 640px) {
-            .games-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-            }
-            .game-card {
-                padding: 12px;
-                min-height: 160px;
-            }
-            .game-card .game-value {
-                font-size: 1.4rem;
-            }
-            .clicker-score {
-                font-size: 2rem;
-            }
-        }
-        @media (max-width: 420px) {
-            .games-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        @media (max-width: 420px) { .games-grid { grid-template-columns: 1fr !important; } }
     </style>
 </head>
 <body class="pb-32">
@@ -1160,7 +311,7 @@
     </div>
     <div class="ambient-noise"></div>
 
-    <!-- ─── FLOATING PARTICLES (ICONS) ─── -->
+    <!-- ─── FLOATING PARTICLES ─── -->
     <div class="floating-particle" style="left:5%;animation-delay:0s;animation-duration:22s;"><i class="fa-solid fa-code"></i></div>
     <div class="floating-particle" style="left:15%;animation-delay:3s;animation-duration:26s;"><i class="fa-solid fa-music"></i></div>
     <div class="floating-particle" style="left:30%;animation-delay:6s;animation-duration:19s;"><i class="fa-solid fa-brain"></i></div>
@@ -1169,7 +320,7 @@
     <div class="floating-particle" style="left:75%;animation-delay:5s;animation-duration:21s;"><i class="fa-solid fa-cpu"></i></div>
     <div class="floating-particle" style="left:88%;animation-delay:8s;animation-duration:25s;"><i class="fa-solid fa-bolt"></i></div>
 
-    <!-- ─── TOAST CONTAINER ─── -->
+    <!-- ─── TOAST ─── -->
     <div id="toast-container"></div>
 
     <!-- ─── VIDEO PIP ─── -->
@@ -1229,7 +380,7 @@
                                 <i class="fa-solid fa-user-ninja text-2xl text-white"></i>
                             </div>
                             <div>
-                                <h2 class="text-2xl font-bold font-display tracking-wide">About me (Avnish)</h2>
+                                <h2 class="text-2xl font-bold font-display tracking-wide">Prashant Kirad</h2>
                                 <p class="text-[var(--accent)] text-sm font-semibold tracking-wider">Developer & Technologist</p>
                             </div>
                         </div>
@@ -1247,22 +398,10 @@
             <!-- ══════ STATS BAR ══════ -->
             <section class="glass-panel p-6 reveal-item">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                    <div>
-                        <div class="stat-counter" data-target="24">0</div>
-                        <div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">Active Modules</div>
-                    </div>
-                    <div>
-                        <div class="stat-counter" data-target="128">0</div>
-                        <div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">AI Sessions</div>
-                    </div>
-                    <div>
-                        <div class="stat-counter" data-target="7">0</div>
-                        <div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">Workspaces</div>
-                    </div>
-                    <div>
-                        <div class="stat-counter" data-target="99">0</div>
-                        <div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">% Uptime</div>
-                    </div>
+                    <div><div class="stat-counter" data-target="24">0</div><div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">Active Modules</div></div>
+                    <div><div class="stat-counter" data-target="128">0</div><div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">AI Sessions</div></div>
+                    <div><div class="stat-counter" data-target="7">0</div><div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">Workspaces</div></div>
+                    <div><div class="stat-counter" data-target="99">0</div><div class="text-[10px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">% Uptime</div></div>
                 </div>
             </section>
 
@@ -1273,15 +412,8 @@
                     <h3 class="font-display font-bold text-lg">Feature Carousel</h3>
                 </div>
                 <div class="carousel-3d">
-                    <div class="carousel-track">
-                        <div class="carousel-item" style="transform:rotateY(0deg) translateZ(240px);"><i class="fa-solid fa-music"></i><span>Media Engine</span></div>
-                        <div class="carousel-item" style="transform:rotateY(45deg) translateZ(240px);"><i class="fa-solid fa-robot"></i><span>Nova AI</span></div>
-                        <div class="carousel-item" style="transform:rotateY(90deg) translateZ(240px);"><i class="fa-solid fa-laptop-code"></i><span>Sandbox</span></div>
-                        <div class="carousel-item" style="transform:rotateY(135deg) translateZ(240px);"><i class="fa-solid fa-list-check"></i><span>Task Board</span></div>
-                        <div class="carousel-item" style="transform:rotateY(180deg) translateZ(240px);"><i class="fa-solid fa-wind"></i><span>Soundscapes</span></div>
-                        <div class="carousel-item" style="transform:rotateY(225deg) translateZ(240px);"><i class="fa-solid fa-stopwatch"></i><span>Pomodoro</span></div>
-                        <div class="carousel-item" style="transform:rotateY(270deg) translateZ(240px);"><i class="fa-solid fa-sliders"></i><span>Settings</span></div>
-                        <div class="carousel-item" style="transform:rotateY(315deg) translateZ(240px);"><i class="fa-solid fa-cloud"></i><span>Weather</span></div>
+                    <div class="carousel-track" id="carousel-track">
+                        <!-- Items injected dynamically by JS to handle mobile Z-translation -->
                     </div>
                 </div>
             </section>
@@ -1293,24 +425,17 @@
                     <h3 class="font-display text-2xl font-bold">Mini‑Games Arcade</h3>
                     <span class="text-xs text-slate-400 font-medium ml-2">— click, choose, build, repeat</span>
                 </div>
-
                 <div class="games-grid">
-
-                    <!-- ─── GAME 1: SPACE ELEVATOR ─── -->
                     <div class="game-card" id="game-elevator">
                         <div class="game-title"><i class="fa-solid fa-rocket"></i> Space Elevator</div>
                         <div class="game-body">
                             <div class="tower-stack" id="tower-stack"></div>
                             <div class="game-value" id="elevator-height">0m</div>
-                            <div class="game-progress w-full max-w-[140px]">
-                                <div class="progress-fill" id="elevator-progress" style="width:0%"></div>
-                            </div>
+                            <div class="game-progress w-full max-w-[140px]"><div class="progress-fill" id="elevator-progress" style="width:0%"></div></div>
                             <button class="game-btn" id="elevator-btn">➕ Build</button>
                             <div class="game-result" id="elevator-message">Click to build toward space!</div>
                         </div>
                     </div>
-
-                    <!-- ─── GAME 2: ABSURD TROLLEY PROBLEM ─── -->
                     <div class="game-card" id="game-trolley">
                         <div class="game-title"><i class="fa-solid fa-people-arrows"></i> Trolley Problem</div>
                         <div class="game-body">
@@ -1323,8 +448,6 @@
                             <button class="game-btn secondary" id="trolley-next" style="font-size:0.6rem;padding:2px 12px;">Next scenario</button>
                         </div>
                     </div>
-
-                    <!-- ─── GAME 3: DESIGN THE NEXT IPHONE ─── -->
                     <div class="game-card" id="game-iphone">
                         <div class="game-title"><i class="fa-solid fa-mobile-screen"></i> Design iPhone</div>
                         <div class="game-body">
@@ -1342,8 +465,6 @@
                             <button class="game-btn secondary" id="iphone-submit" style="font-size:0.6rem;padding:2px 14px;">📱 Generate</button>
                         </div>
                     </div>
-
-                    <!-- ─── GAME 4: NOVA CLICKER ─── -->
                     <div class="game-card" id="game-clicker">
                         <div class="game-title"><i class="fa-solid fa-hand-pointer"></i> Nova Clicker</div>
                         <div class="game-body">
@@ -1357,40 +478,27 @@
                             <div class="game-result" id="clicker-message">Click for Nova points!</div>
                         </div>
                     </div>
-
-                    <!-- ─── GAME 5: PASSWORD STRENGTH ─── -->
                     <div class="game-card" id="game-password">
                         <div class="game-title"><i class="fa-solid fa-shield-halved"></i> Password Check</div>
                         <div class="game-body">
                             <input id="password-input" class="input-base w-full py-1.5 px-3 text-xs" placeholder="Type a password..." type="text" style="max-width:180px;" />
-                            <div class="password-strength-bar w-full max-w-[180px]">
-                                <div class="strength-fill" id="strength-fill" style="width:0%;background:#94a3b8;"></div>
-                            </div>
+                            <div class="password-strength-bar w-full max-w-[180px]"><div class="strength-fill" id="strength-fill" style="width:0%;background:#94a3b8;"></div></div>
                             <div class="password-strength-label" id="strength-label">Type to check</div>
                             <div class="game-result" id="password-feedback" style="font-size:0.65rem;">Add numbers, symbols, length</div>
                         </div>
                     </div>
-
                 </div>
             </section>
 
             <!-- ══════ MAIN DECK ── GRID ══════ -->
             <main class="perspective-card grid lg:grid-cols-12 gap-8">
-
-                <!-- ─── COLUMN LEFT (7 cols) ─── -->
                 <div class="lg:col-span-7 space-y-8">
-
                     <!-- MEDIA ENGINE -->
                     <section id="media-deck" class="glass-panel p-8 reveal-item tilt-card">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                             <div class="flex items-center gap-2">
-                                <div class="w-10 h-10 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-lg glow-pulse">
-                                    <i class="fa-solid fa-music"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-display text-2xl font-bold">Media Engine</h3>
-                                    <p class="text-xs text-slate-400">Stream full tracks from YouTube</p>
-                                </div>
+                                <div class="w-10 h-10 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-lg glow-pulse"><i class="fa-solid fa-music"></i></div>
+                                <div><h3 class="font-display text-2xl font-bold">Media Engine</h3><p class="text-xs text-slate-400">Stream full tracks from YouTube</p></div>
                             </div>
                             <div class="flex gap-1 p-1 bg-black/40 rounded-xl border border-white/5 self-end">
                                 <button onclick="switchMediaTab('player')" id="tab-btn-player" class="media-tab-btn px-4 py-1.5 rounded-lg text-xs font-semibold bg-[var(--accent)] text-white">Player</button>
@@ -1398,84 +506,41 @@
                                 <button onclick="switchMediaTab('queue')" id="tab-btn-queue" class="media-tab-btn px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1">Queue <span id="queue-badge" class="bg-white/10 px-1.5 py-0.5 rounded-full text-[10px]">0</span></button>
                             </div>
                         </div>
-
                         <div class="w-full rounded-2xl bg-black/50 border border-white/5 p-5 space-y-6">
-                            <!-- Player -->
                             <div id="media-tab-player" class="media-tab-panel flex flex-col md:flex-row gap-6 items-center">
-                                <div class="relative">
-                                    <div class="disk-container" id="music-vinyl">
-                                        <div class="disk-vinyl-lines"></div>
-                                        <img id="music-art" class="disk-art" src="https://images.unsplash.com/photo-1614149162883-504ce4d13909?q=80&w=200&h=200&fit=crop" alt="Vinyl Art">
-                                        <div class="disk-center"></div>
-                                    </div>
-                                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2" id="music-eq">
-                                        <div class="equalizer flex gap-1 items-end h-7 w-12 justify-center">
-                                            <div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div>
-                                            <div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div>
-                                            <div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div>
-                                            <div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div>
-                                            <div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <div class="relative"><div class="disk-container" id="music-vinyl"><div class="disk-vinyl-lines"></div><img id="music-art" class="disk-art" src="https://images.unsplash.com/photo-1614149162883-504ce4d13909?q=80&w=200&h=200&fit=crop" alt="Vinyl Art"><div class="disk-center"></div></div><div class="absolute -bottom-2 left-1/2 -translate-x-1/2" id="music-eq"><div class="equalizer flex gap-1 items-end h-7 w-12 justify-center"><div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div><div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div><div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div><div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div><div class="eq-bar w-1 bg-[var(--accent)] rounded-t"></div></div></div></div>
                                 <div class="flex-1 w-full space-y-4">
-                                    <div>
-                                        <div class="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] font-bold mb-1">Now Streaming</div>
-                                        <h4 id="music-title" class="text-lg font-bold text-white truncate max-w-sm">No track selected</h4>
-                                        <p id="music-artist" class="text-sm text-slate-400 truncate max-w-sm">Use Discover tab to search</p>
-                                    </div>
-                                    <div class="space-y-1">
-                                        <input type="range" id="music-slider" min="0" max="100" value="0" class="w-full accent-[var(--accent)]">
-                                        <div class="flex justify-between text-xs text-slate-500 font-mono">
-                                            <span id="music-time-current">0:00</span>
-                                            <span id="music-time-total">0:00</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center justify-between">
+                                    <div><div class="text-[10px] uppercase tracking-[0.3em] text-[var(--accent)] font-bold mb-1">Now Streaming</div><h4 id="music-title" class="text-lg font-bold text-white truncate max-w-sm">No track selected</h4><p id="music-artist" class="text-sm text-slate-400 truncate max-w-sm">Use Discover tab to search</p></div>
+                                    <div class="space-y-1"><input type="range" id="music-slider" min="0" max="100" value="0" class="w-full accent-[var(--accent)]"><div class="flex justify-between text-xs text-slate-500 font-mono"><span id="music-time-current">0:00</span><span id="music-time-total">0:00</span></div></div>
+                                    <div class="flex items-center justify-between media-controls">
                                         <div class="flex items-center gap-4">
                                             <button onclick="playPrevSong()" class="text-slate-400 hover:text-white transition text-lg"><i class="fa-solid fa-backward-step"></i></button>
                                             <button onclick="toggleMusicPlayback()" id="music-play-btn" class="w-12 h-12 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-lg shadow-[var(--accent-glow)] hover:scale-105 active:scale-95 transition text-lg glow-pulse"><i class="fa-solid fa-play"></i></button>
                                             <button onclick="playNextSong()" class="text-slate-400 hover:text-white transition text-lg"><i class="fa-solid fa-forward-step"></i></button>
                                         </div>
                                         <div class="flex items-center gap-3">
-                                            <button onclick="togglePip()" id="music-pip-btn" class="text-slate-400 hover:text-[var(--accent)] transition text-sm" title="Toggle PIP Video Screen"><i class="fa-solid fa-tv"></i></button>
+                                            <button onclick="togglePip()" id="music-pip-btn" class="text-slate-400 hover:text-[var(--accent)] transition text-sm" title="Toggle PIP"><i class="fa-solid fa-tv"></i></button>
                                             <button onclick="toggleMute()" id="music-mute-btn" class="text-slate-400 hover:text-white transition text-sm"><i class="fa-solid fa-volume-high"></i></button>
                                             <input type="range" id="music-volume" min="0" max="100" value="80" class="w-20 h-1 accent-[var(--accent)]">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Discover -->
                             <div id="media-tab-search" class="media-tab-panel hidden space-y-4">
-                                <div class="flex gap-2">
-                                    <input id="music-search" class="input-base w-full py-2 px-4 text-sm" placeholder="Enter song name or artist..." />
-                                    <button id="music-search-btn" onclick="triggerMusicSearch()" class="btn-accent px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
-                                </div>
+                                <div class="flex gap-2"><input id="music-search" class="input-base w-full py-2 px-4 text-sm" placeholder="Enter song name or artist..." /><button id="music-search-btn" onclick="triggerMusicSearch()" class="btn-accent px-5 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5"><i class="fa-solid fa-magnifying-glass"></i> Search</button></div>
                                 <div id="music-search-results" class="hidden flex-col gap-2 p-2 rounded-xl bg-black/30 border border-white/5 max-h-48 overflow-y-auto"></div>
-                                <div class="space-y-2">
-                                    <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Nova Curated</div>
-                                    <div class="grid grid-cols-3 gap-2">
-                                        <button onclick="loadCuratedPlaylist('phonk')" class="glass-card p-3 flex flex-col gap-1 items-center text-center"><div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm"><i class="fa-solid fa-bolt"></i></div><span class="text-xs font-bold mt-1 text-slate-200">Phonk</span></button>
-                                        <button onclick="loadCuratedPlaylist('naruto')" class="glass-card p-3 flex flex-col gap-1 items-center text-center"><div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm"><i class="fa-solid fa-fire"></i></div><span class="text-xs font-bold mt-1 text-slate-200">Naruto</span></button>
-                                        <button onclick="loadCuratedPlaylist('lofi')" class="glass-card p-3 flex flex-col gap-1 items-center text-center"><div class="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm"><i class="fa-solid fa-mug-hot"></i></div><span class="text-xs font-bold mt-1 text-slate-200">Study</span></button>
-                                    </div>
-                                </div>
+                                <div class="space-y-2"><div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-1">Nova Curated</div><div class="grid grid-cols-3 gap-2"><button onclick="loadCuratedPlaylist('phonk')" class="glass-card p-3 flex flex-col gap-1 items-center text-center"><div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-sm"><i class="fa-solid fa-bolt"></i></div><span class="text-xs font-bold mt-1 text-slate-200">Phonk</span></button><button onclick="loadCuratedPlaylist('naruto')" class="glass-card p-3 flex flex-col gap-1 items-center text-center"><div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm"><i class="fa-solid fa-fire"></i></div><span class="text-xs font-bold mt-1 text-slate-200">Naruto</span></button><button onclick="loadCuratedPlaylist('lofi')" class="glass-card p-3 flex flex-col gap-1 items-center text-center"><div class="w-8 h-8 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center text-sm"><i class="fa-solid fa-mug-hot"></i></div><span class="text-xs font-bold mt-1 text-slate-200">Study</span></button></div></div>
                             </div>
-                            <!-- Queue -->
                             <div id="media-tab-queue" class="media-tab-panel hidden space-y-3">
                                 <div class="flex justify-between items-center"><div class="text-xs font-semibold text-slate-400">Queue List</div><button onclick="clearQueue()" class="text-[10px] text-rose-400 hover:text-rose-300 font-semibold border border-rose-950/40 bg-rose-950/10 px-2 py-0.5 rounded">Clear</button></div>
                                 <div id="music-queue-list" class="flex flex-col gap-1 max-h-60 overflow-y-auto pr-1"></div>
                             </div>
                         </div>
                     </section>
-
                     <!-- CODE SANDBOX -->
                     <section id="sandbox-deck" class="glass-panel p-8 reveal-item tilt-card">
                         <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center gap-2">
-                                <div class="w-10 h-10 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-lg glow-pulse"><i class="fa-solid fa-laptop-code"></i></div>
-                                <div><h3 class="font-display text-2xl font-bold">Code Sandbox 2.0</h3><p class="text-xs text-slate-400">Write HTML, CSS, JS with live logs</p></div>
-                            </div>
+                            <div class="flex items-center gap-2"><div class="w-10 h-10 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] text-lg glow-pulse"><i class="fa-solid fa-laptop-code"></i></div><div><h3 class="font-display text-2xl font-bold">Code Sandbox 2.0</h3><p class="text-xs text-slate-400">Write HTML, CSS, JS with live logs</p></div></div>
                             <div class="flex gap-1.5 p-1 bg-black/40 rounded-xl border border-white/5">
                                 <button data-lang="html" class="sandbox-tab-btn px-3 py-1 rounded-lg text-xs font-semibold bg-[var(--accent)] text-white">HTML</button>
                                 <button data-lang="css" class="sandbox-tab-btn px-3 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white">CSS</button>
@@ -1488,52 +553,31 @@
                                 <textarea id="sandbox-html" class="input-base w-full h-72 p-4 font-mono text-xs resize-none" placeholder="HTML Structure"><div class="sandbox-card"><h2>Live Sandbox</h2><p>Modify and hit run to see. Try console logs!</p><button id="test-btn">Trigger Click</button></div></textarea>
                                 <textarea id="sandbox-css" class="input-base w-full h-72 p-4 font-mono text-xs resize-none hidden" placeholder="CSS Styling">.sandbox-card{padding:24px;background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(6,182,212,0.2));border:1px solid rgba(255,255,255,0.1);border-radius:16px;text-align:center;color:#fff;font-family:sans-serif;}button{background:#8b5cf6;color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;margin-top:12px;transition:background 0.2s;}button:hover{background:#a78bfa;}</textarea>
                                 <textarea id="sandbox-js" class="input-base w-full h-72 p-4 font-mono text-xs resize-none hidden" placeholder="JavaScript Engine">console.log("Sandbox environment initialized!");document.getElementById('test-btn').onclick=()=>{console.log("Button clicked!");alert("Hello from sandbox!");};</textarea>
-                                <div id="sandbox-console" class="hidden flex-col bg-black/60 border border-white/5 rounded-xl overflow-hidden h-72">
-                                    <div class="flex justify-between items-center p-2 bg-white/5 border-b border-white/5 text-[10px] text-slate-400 font-semibold uppercase tracking-wider"><span>Console</span><button onclick="clearSandboxLogs()" class="text-rose-400 hover:text-rose-300">Clear</button></div>
-                                    <div id="sandbox-console-logs" class="p-3 flex-1 overflow-y-auto flex flex-col gap-1 font-mono text-xs text-slate-300"></div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <button id="sandbox-run-btn" onclick="runSandboxCode()" class="btn-accent py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Compile & Render</button>
-                                    <button onclick="loadTemplate('ripple')" class="glass-card py-3 rounded-xl text-xs text-slate-300 hover:text-white flex items-center justify-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles"></i> Load Ripple</button>
-                                </div>
+                                <div id="sandbox-console" class="hidden flex-col bg-black/60 border border-white/5 rounded-xl overflow-hidden h-72"><div class="flex justify-between items-center p-2 bg-white/5 border-b border-white/5 text-[10px] text-slate-400 font-semibold uppercase tracking-wider"><span>Console</span><button onclick="clearSandboxLogs()" class="text-rose-400 hover:text-rose-300">Clear</button></div><div id="sandbox-console-logs" class="p-3 flex-1 overflow-y-auto flex flex-col gap-1 font-mono text-xs text-slate-300"></div></div>
+                                <div class="grid grid-cols-2 gap-2"><button id="sandbox-run-btn" onclick="runSandboxCode()" class="btn-accent py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"><i class="fa-solid fa-play"></i> Compile & Render</button><button onclick="loadTemplate('ripple')" class="glass-card py-3 rounded-xl text-xs text-slate-300 hover:text-white flex items-center justify-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles"></i> Load Ripple</button></div>
                             </div>
-                            <div class="rounded-2xl overflow-hidden bg-[#060609] border border-white/10 flex flex-col relative h-[380px] lg:h-auto">
-                                <div class="p-3 bg-white/5 border-b border-white/10 flex items-center gap-2 text-xs text-slate-400"><div class="flex gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500/80"></span><span class="w-3 h-3 rounded-full bg-amber-500/80"></span><span class="w-3 h-3 rounded-full bg-emerald-500/80"></span></div><span class="font-mono text-[10px] tracking-wide ml-2">localhost:8000/preview</span></div>
-                                <iframe id="sandbox-preview" class="w-full flex-1 bg-transparent border-none"></iframe>
-                            </div>
+                            <div class="rounded-2xl overflow-hidden bg-[#060609] border border-white/10 flex flex-col relative h-[380px] lg:h-auto"><div class="p-3 bg-white/5 border-b border-white/10 flex items-center gap-2 text-xs text-slate-400"><div class="flex gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500/80"></span><span class="w-3 h-3 rounded-full bg-amber-500/80"></span><span class="w-3 h-3 rounded-full bg-emerald-500/80"></span></div><span class="font-mono text-[10px] tracking-wide ml-2">localhost:8000/preview</span></div><iframe id="sandbox-preview" class="w-full flex-1 bg-transparent border-none"></iframe></div>
                         </div>
                     </section>
                 </div>
-
-                <!-- ─── COLUMN RIGHT (5 cols) ─── -->
                 <div class="lg:col-span-5 space-y-8">
-
                     <!-- NOVA AI -->
                     <section id="ai-chat" class="glass-panel p-6 flex flex-col h-[530px] reveal-item tilt-card">
-                        <div class="flex items-center justify-between pb-4 border-b border-white/5 mb-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-[var(--accent-glow)] glow-pulse"><i class="fa-solid fa-robot text-white"></i></div>
-                                <div><h3 class="font-display font-bold leading-tight">Nova AI</h3><p class="text-xs text-[var(--accent)] font-semibold">AI Assistant</p></div>
-                            </div>
-                        </div>
+                        <div class="flex items-center justify-between pb-4 border-b border-white/5 mb-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-lg shadow-[var(--accent-glow)] glow-pulse"><i class="fa-solid fa-robot text-white"></i></div><div><h3 class="font-display font-bold leading-tight">Nova AI</h3><p class="text-xs text-[var(--accent)] font-semibold">Llama 3.3 • 70B Assistant</p></div></div></div>
                         <div id="ai-chat-window" class="flex-1 overflow-y-auto pr-2 space-y-4 mb-4 flex flex-col"></div>
                         <div class="flex gap-1.5 overflow-x-auto pb-2 pr-1 mb-2">
                             <button onclick="fillAiPrompt('Write a 3-hour study plan for React hooks')" class="glass-card px-3 py-1.5 text-[10px] text-slate-300 hover:text-white rounded-full whitespace-nowrap"><i class="fa-solid fa-calendar-day mr-1 text-[var(--accent)]"></i> Study Plan</button>
                             <button onclick="fillAiPrompt('Explain closure in Javascript with a simple example')" class="glass-card px-3 py-1.5 text-[10px] text-slate-300 hover:text-white rounded-full whitespace-nowrap"><i class="fa-solid fa-code mr-1 text-cyan-400"></i> Explain JS</button>
                             <button onclick="fillAiPrompt('What is the history of Phonk music?')" class="glass-card px-3 py-1.5 text-[10px] text-slate-300 hover:text-white rounded-full whitespace-nowrap"><i class="fa-solid fa-music mr-1 text-rose-400"></i> Phonk Lore</button>
                         </div>
-                        <form id="ai-form" class="relative mt-auto">
-                            <input id="ai-input" class="input-base w-full py-3 pl-4 pr-12 text-xs" placeholder="Ask Nova anything..." autocomplete="off" />
-                            <button type="submit" id="ai-send-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--accent)] hover:text-white transition p-2"><i class="fa-solid fa-paper-plane"></i></button>
-                        </form>
+                        <form id="ai-form" class="relative mt-auto"><input id="ai-input" class="input-base w-full py-3 pl-4 pr-12 text-xs" placeholder="Ask Nova anything..." autocomplete="off" /><button type="submit" id="ai-send-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--accent)] hover:text-white transition p-2"><i class="fa-solid fa-paper-plane"></i></button></form>
                     </section>
-
                     <!-- TASK BOARD -->
                     <section id="planner-deck" class="glass-panel p-6 reveal-item tilt-card">
                         <div class="flex items-center gap-2 mb-4"><div class="w-8 h-8 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] glow-pulse"><i class="fa-solid fa-list-check"></i></div><h3 class="font-display font-bold">Workspace Task Board</h3></div>
-                        <div class="flex flex-col gap-2 mb-4 p-3 rounded-xl bg-white/5 border border-white/5">
+                        <div class="flex flex-col gap-2 mb-4 p-3 rounded-xl bg-white/5 border border-white/5 task-board-inputs">
                             <input id="task-title" class="input-base w-full py-2 px-3 text-xs" placeholder="Add task title..." />
-                            <div class="flex justify-between items-center gap-2">
+                            <div class="flex justify-between items-center gap-2 flex-wrap">
                                 <select id="task-category" class="input-base py-1.5 px-2 text-[10px] w-24"><option value="Study">Study</option><option value="Coding">Coding</option><option value="Personal">Personal</option></select>
                                 <select id="task-priority" class="input-base py-1.5 px-2 text-[10px] w-24"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select>
                                 <button onclick="addTask()" class="btn-accent py-1.5 px-4 rounded-lg text-xs font-bold">Add Task</button>
@@ -1545,7 +589,6 @@
                             <div class="space-y-2"><div class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 flex justify-between items-center px-1"><span>Completed</span><span id="count-done" class="bg-emerald-950/20 px-1.5 py-0.25 rounded text-[9px]">0</span></div><div id="task-list-done" class="flex flex-col gap-2 max-h-40 overflow-y-auto"></div></div>
                         </div>
                     </section>
-
                     <!-- SOUNDSCAPES -->
                     <section id="soundscapes-deck" class="glass-panel p-6 reveal-item tilt-card">
                         <div class="flex items-center gap-2 mb-4"><div class="w-8 h-8 rounded-full bg-[var(--accent-glow)] flex items-center justify-center text-[var(--accent)] glow-pulse"><i class="fa-solid fa-volume-low"></i></div><h3 class="font-display font-bold">Ambient Soundscape Mixer</h3></div>
@@ -1556,71 +599,31 @@
                             <div class="glass-card p-3 flex flex-col gap-2"><div class="flex justify-between items-center"><span class="text-xs font-semibold text-slate-200"><i class="fa-solid fa-fire text-rose-500 mr-1.5"></i> Fire</span><button data-sound="fire" class="sound-toggle text-[10px] px-2 py-0.5 rounded-full border border-white/10 hover:border-white/30 transition">Play</button></div><input type="range" data-sound="fire" min="0" max="100" value="50" class="sound-volume w-full accent-[var(--accent)]"></div>
                         </div>
                     </section>
-
                     <!-- WEATHER + TIMER -->
                     <section id="weather" class="glass-panel p-6 relative overflow-hidden reveal-item tilt-card">
                         <div class="absolute -right-10 -top-10 text-[9rem] opacity-4 text-[var(--accent)]"><i class="fa-solid fa-cloud-sun-rain"></i></div>
-                        <div class="flex justify-between items-center relative z-10">
-                            <div><p id="wx-city" class="text-xs uppercase tracking-[0.3em] text-slate-400 mb-1">Locating...</p><h3 id="wx-temp" class="text-5xl font-display font-bold">--°</h3><p id="wx-desc" class="text-sm text-[var(--accent)] font-semibold capitalize mt-1">Awaiting link</p></div>
-                            <div class="text-right"><input id="wx-search" class="input-base w-32 py-1.5 px-3 text-xs text-center" placeholder="Change City" /></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 mt-6 relative z-10">
-                            <div class="glass-card p-3 text-center"><div id="wx-hum" class="font-bold text-slate-200">--%</div><div class="text-[10px] text-slate-400 uppercase tracking-wider mt-1">Humidity</div></div>
-                            <div class="glass-card p-3 text-center"><div id="wx-wind" class="font-bold text-slate-200">--</div><div class="text-[10px] text-slate-400 uppercase tracking-wider mt-1">Wind</div></div>
-                            <div class="glass-card p-3 text-center"><div id="wx-feel" class="font-bold text-slate-200">--°</div><div class="text-[10px] text-slate-400 uppercase tracking-wider mt-1">Feels Like</div></div>
-                        </div>
+                        <div class="flex justify-between items-center relative z-10"><div><p id="wx-city" class="text-xs uppercase tracking-[0.3em] text-slate-400 mb-1">Locating...</p><h3 id="wx-temp" class="text-5xl font-display font-bold">--°</h3><p id="wx-desc" class="text-sm text-[var(--accent)] font-semibold capitalize mt-1">Awaiting link</p></div><div class="text-right"><input id="wx-search" class="input-base w-32 py-1.5 px-3 text-xs text-center" placeholder="Change City" /></div></div>
+                        <div class="grid grid-cols-3 gap-2 mt-6 relative z-10"><div class="glass-card p-3 text-center"><div id="wx-hum" class="font-bold text-slate-200">--%</div><div class="text-[10px] text-slate-400 uppercase tracking-wider mt-1">Humidity</div></div><div class="glass-card p-3 text-center"><div id="wx-wind" class="font-bold text-slate-200">--</div><div class="text-[10px] text-slate-400 uppercase tracking-wider mt-1">Wind</div></div><div class="glass-card p-3 text-center"><div id="wx-feel" class="font-bold text-slate-200">--°</div><div class="text-[10px] text-slate-400 uppercase tracking-wider mt-1">Feels Like</div></div></div>
                     </section>
-
                     <section id="timer" class="glass-panel p-6 flex flex-col items-center justify-center relative overflow-hidden reveal-item tilt-card">
                         <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black/30 pointer-events-none"></div>
                         <h3 class="absolute top-6 left-6 font-display font-bold text-slate-300"><i class="fa-solid fa-stopwatch text-[var(--accent)] mr-2 animate-pulse"></i> Deep Focus</h3>
-                        <div class="relative w-44 h-44 mt-8 mb-4">
-                            <svg class="w-full h-full -rotate-90 transform drop-shadow-2xl" viewBox="0 0 100 100">
-                                <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="4"></circle>
-                                <circle id="timer-ring" cx="50" cy="50" r="45" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear;"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center"><span id="timer-display" class="font-display text-4xl font-extrabold">25:00</span></div>
-                        </div>
-                        <div class="flex gap-3 relative z-10">
-                            <button id="btn-timer-start" class="btn-accent px-6 py-2 rounded-full font-semibold text-xs w-24">Start</button>
-                            <button id="btn-timer-reset" class="glass-card px-6 py-2 rounded-full font-semibold text-xs text-slate-300 hover:text-white">Reset</button>
-                        </div>
+                        <div class="relative w-44 h-44 mt-8 mb-4"><svg class="w-full h-full -rotate-90 transform drop-shadow-2xl" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="4"></circle><circle id="timer-ring" cx="50" cy="50" r="45" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear;"></circle></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span id="timer-display" class="font-display text-4xl font-extrabold">25:00</span></div></div>
+                        <div class="flex gap-3 relative z-10"><button id="btn-timer-start" class="btn-accent px-6 py-2 rounded-full font-semibold text-xs w-24">Start</button><button id="btn-timer-reset" class="glass-card px-6 py-2 rounded-full font-semibold text-xs text-slate-300 hover:text-white">Reset</button></div>
                     </section>
                 </div>
             </main>
-
-            <!-- ══════ SETTINGS ══════ -->
             <section id="settings" class="glass-panel p-8 mt-8 reveal-item tilt-card">
                 <div class="flex items-center gap-3 mb-6"><i class="fa-solid fa-sliders text-[var(--accent)] text-2xl glow-pulse"></i><h3 class="font-display text-2xl font-bold">System Preferences</h3></div>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="glass-card p-5 space-y-4">
-                        <label class="block text-sm text-slate-400 mb-1.5 font-medium">Core Accent Color</label>
-                        <div class="flex items-center gap-4">
-                            <input type="color" id="set-accent" value="#8b5cf6" class="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-none p-0">
-                            <span class="text-sm font-mono text-slate-300" id="accent-hex">#8b5cf6</span>
-                        </div>
-                    </div>
-                    <div class="glass-card p-5 space-y-3">
-                        <label class="block text-sm text-slate-400 font-medium">Glassmorphism Intensity</label>
-                        <input type="range" id="set-blur" min="10" max="80" value="24" class="w-full accent-[var(--accent)]">
-                        <div class="flex justify-between text-xs text-slate-500 mt-1"><span>Subtle</span><span>Intense</span></div>
-                    </div>
-                    <div class="glass-card p-5 space-y-3">
-                        <label class="block text-sm text-slate-400 font-medium">Interactive Wallpapers</label>
-                        <div class="grid grid-cols-2 gap-1.5">
-                            <button onclick="applyWallpaperTheme('obsidian')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Obsidian</button>
-                            <button onclick="applyWallpaperTheme('cyberpunk')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Cyber Neon</button>
-                            <button onclick="applyWallpaperTheme('cosmic')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Cosmic</button>
-                            <button onclick="applyWallpaperTheme('amber')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Amber</button>
-                        </div>
-                    </div>
+                <div class="grid md:grid-cols-3 gap-6 settings-grid">
+                    <div class="glass-card p-5 space-y-4"><label class="block text-sm text-slate-400 mb-1.5 font-medium">Core Accent Color</label><div class="flex items-center gap-4"><input type="color" id="set-accent" value="#8b5cf6" class="w-10 h-10 rounded-lg cursor-pointer bg-transparent border-none p-0"><span class="text-sm font-mono text-slate-300" id="accent-hex">#8b5cf6</span></div></div>
+                    <div class="glass-card p-5 space-y-3"><label class="block text-sm text-slate-400 font-medium">Glassmorphism Intensity</label><input type="range" id="set-blur" min="10" max="80" value="24" class="w-full accent-[var(--accent)]"><div class="flex justify-between text-xs text-slate-500 mt-1"><span>Subtle</span><span>Intense</span></div></div>
+                    <div class="glass-card p-5 space-y-3"><label class="block text-sm text-slate-400 font-medium">Interactive Wallpapers</label><div class="grid grid-cols-2 gap-1.5"><button onclick="applyWallpaperTheme('obsidian')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Obsidian</button><button onclick="applyWallpaperTheme('cyberpunk')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Cyber Neon</button><button onclick="applyWallpaperTheme('cosmic')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Cosmic</button><button onclick="applyWallpaperTheme('amber')" class="py-1 px-2 text-[10px] bg-white/5 border border-white/10 rounded-lg text-slate-300 hover:text-white">Amber</button></div></div>
                 </div>
             </section>
-
         </div>
     </div>
 
-    <!-- ─── DOCK ─── -->
     <div class="dock-container">
         <div onclick="scrollToSection('hero-banner')" class="dock-item"><i class="fa-solid fa-house"></i><span class="dock-tooltip">Dashboard</span></div>
         <div onclick="scrollToSection('media-deck')" class="dock-item"><i class="fa-solid fa-circle-play"></i><span class="dock-tooltip">Media</span></div>
@@ -1631,238 +634,165 @@
         <div onclick="scrollToSection('settings')" class="dock-item"><i class="fa-solid fa-gears"></i><span class="dock-tooltip">Settings</span></div>
     </div>
 
-    <!-- ─── SCRIPTS ─── -->
     <script>
-        /* ========================================================
-           0. UTILITIES & TOAST
-           ======================================================== */
+        /* ──────────────────────────────────────────────
+           EXISTING SCRIPTS (unchanged except carousel)
+           ────────────────────────────────────────────── */
         const apiBaseUrl = window.location.protocol === 'file:' ? 'http://127.0.0.1:8000' : '';
 
-        function showToast(message, icon = 'fa-circle-check') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML =
-                `<span class="icon"><i class="fa-solid ${icon}"></i></span> <span class="font-medium">${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateY(20px) scale(0.95)';
-                setTimeout(() => toast.remove(), 400);
-            }, 3200);
+        function showToast(m, i = 'fa-circle-check') {
+            const c = document.getElementById('toast-container');
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.innerHTML = `<span class="icon"><i class="fa-solid ${i}"></i></span> <span class="font-medium">${m}</span>`;
+            c.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0';
+                t.style.transform = 'translateY(20px) scale(0.95)';
+                setTimeout(() => t.remove(), 400); }, 3200);
         }
 
-        function formatDuration(sec) {
-            if (isNaN(sec) || !isFinite(sec)) return "0:00";
-            const m = Math.floor(sec / 60),
-                s = Math.floor(sec % 60).toString().padStart(2, '0');
-            return `${m}:${s}`;
-        }
+        function formatDuration(sec) { if (isNaN(sec) || !isFinite(sec)) return "0:00"; const m = Math.floor(sec / 60),
+                s = Math.floor(sec % 60).toString().padStart(2, '0'); return `${m}:${s}`; }
 
-        function formatTimeFromMs(ms) {
-            const sec = Math.floor(ms / 1000);
-            return formatDuration(sec);
-        }
+        function formatTimeFromMs(ms) { return formatDuration(Math.floor(ms / 1000)); }
 
-        function scrollToSection(id) {
-            const el = document.getElementById(id);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+        function scrollToSection(id) { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth',
+                block: 'center' }); }
 
-        /* ========================================================
-           1. PARTICLE NETWORK (canvas)
-           ======================================================== */
+        // PARTICLE CANVAS (unchanged)
         (function initParticles() {
             const canvas = document.getElementById('particle-canvas');
             const ctx = canvas.getContext('2d');
-            let w, h, particles = [];
+            let w, h,
+                particles = [];
             const COUNT = 110,
                 MAX_DIST = 140;
 
-            function resize() {
-                w = canvas.width = window.innerWidth;
-                h = canvas.height = window.innerHeight;
-            }
+            function resize() { w = canvas.width = window.innerWidth;
+                h = canvas.height = window.innerHeight; }
             window.addEventListener('resize', resize);
             resize();
-
             class Particle {
                 constructor() { this.reset(); }
-                reset() {
-                    this.x = Math.random() * w;
+                reset() { this.x = Math.random() * w;
                     this.y = Math.random() * h;
                     this.vx = (Math.random() - 0.5) * 0.3;
                     this.vy = (Math.random() - 0.5) * 0.3;
-                    this.radius = Math.random() * 1.8 + 1.2;
-                }
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    if (this.x < 0 || this.x > w) this.vx *= -1;
-                    if (this.y < 0 || this.y > h) this.vy *= -1;
-                }
-                draw() {
-                    ctx.beginPath();
+                    this.radius = Math.random() * 1.8 + 1.2; }
+                update() { this.x += this.vx;
+                    this.y += this.vy; if (this.x < 0 || this.x > w) this.vx *= -1; if (this.y < 0 || this.y > h) this
+                        .vy *= -1; }
+                draw() { ctx.beginPath();
                     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                     ctx.fillStyle = 'rgba(139,92,246,0.4)';
-                    ctx.fill();
-                }
+                    ctx.fill(); }
             }
-
             for (let i = 0; i < COUNT; i++) particles.push(new Particle());
 
             function drawConnections() {
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x,
-                            dy = particles[i].y - particles[j].y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < MAX_DIST) {
-                            const alpha = (1 - dist / MAX_DIST) * 0.35;
+                            dy = particles[i].y - particles[j].y,
+                            dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < MAX_DIST) { const a = (1 - dist / MAX_DIST) * 0.35;
                             ctx.beginPath();
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.strokeStyle = `rgba(139,92,246,${alpha})`;
+                            ctx.strokeStyle = `rgba(139,92,246,${a})`;
                             ctx.lineWidth = 0.7;
-                            ctx.stroke();
-                        }
+                            ctx.stroke(); }
                     }
                 }
             }
 
-            function animate() {
-                ctx.clearRect(0, 0, w, h);
+            function animate() { ctx.clearRect(0, 0, w, h);
                 particles.forEach(p => { p.update();
                     p.draw(); });
                 drawConnections();
-                requestAnimationFrame(animate);
-            }
+                requestAnimationFrame(animate); }
             animate();
-
-            let mouseX = -1,
-                mouseY = -1;
-            document.addEventListener('mousemove', e => { mouseX = e.clientX;
-                mouseY = e.clientY; });
-            document.addEventListener('mouseleave', () => { mouseX = -1;
-                mouseY = -1; });
-
-            const origUpdate = Particle.prototype.update;
+            let mx = -1,
+                my = -1;
+            document.addEventListener('mousemove', e => { mx = e.clientX;
+                my = e.clientY; });
+            document.addEventListener('mouseleave', () => { mx = -1;
+                my = -1; });
+            const orig = Particle.prototype.update;
             Particle.prototype.update = function() {
-                origUpdate.call(this);
-                if (mouseX > 0 && mouseY > 0) {
-                    const dx = this.x - mouseX,
-                        dy = this.y - mouseY;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 120) {
-                        const force = (120 - dist) / 120 * 0.8;
-                        this.x += (dx / dist) * force;
-                        this.y += (dy / dist) * force;
-                    }
-                }
+                orig.call(this);
+                if (mx > 0 && my > 0) { const dx = this.x - mx,
+                        dy = this.y - my,
+                        dist = Math.sqrt(dx * dx + dy * dy); if (dist < 120) { const f = (120 - dist) / 120 * 0.8;
+                        this.x += (dx / dist) * f;
+                        this.y += (dy / dist) * f; } }
             };
         })();
 
-        /* ========================================================
-           2. MOUSE GLOW TRAIL
-           ======================================================== */
-        (function initGlowTrail() {
+        // GLOW TRAIL (unchanged)
+        (function() {
             const trail = document.getElementById('glow-trail');
             let active = false,
                 x = 0,
                 y = 0;
-            document.addEventListener('mousemove', e => {
-                x = e.clientX;
-                y = e.clientY;
-                if (!active) { active = true;
+            document.addEventListener('mousemove', e => { x = e.clientX;
+                y = e.clientY; if (!active) { active = true;
                     trail.classList.add('active'); }
                 trail.style.left = x + 'px';
-                trail.style.top = y + 'px';
-            });
+                trail.style.top = y + 'px'; });
             document.addEventListener('mouseleave', () => { active = false;
                 trail.classList.remove('active'); });
         })();
 
-        /* ========================================================
-           3. 3D TILT ON .tilt-card
-           ======================================================== */
-        (function initTilt() {
-            const cards = document.querySelectorAll('.tilt-card');
-            cards.forEach(card => {
-                card.addEventListener('mousemove', e => {
-                    const rect = card.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2,
-                        cy = rect.top + rect.height / 2;
-                    const dx = e.clientX - cx,
-                        dy = e.clientY - cy;
-                    const rotX = (dy / rect.height) * -6;
-                    const rotY = (dx / rect.width) * 6;
-                    card.style.transform =
-                        `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(4px)`;
-                });
-                card.addEventListener('mouseleave', () => {
-                    card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
-                });
+        // 3D TILT / MAGNETIC (disabled on touch)
+        if (!('ontouchstart' in window)) {
+            document.querySelectorAll('.tilt-card').forEach(c => {
+                c.addEventListener('mousemove', e => { const r = c.getBoundingClientRect(),
+                        cx = r.left + r.width / 2,
+                        cy = r.top + r.height / 2,
+                        dx = e.clientX - cx,
+                        dy = e.clientY - cy,
+                        rx = (dy / r.height) * -6,
+                        ry = (dx / r.width) * 6;
+                    c.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(4px)`; });
+                c.addEventListener('mouseleave', () => { c.style.transform =
+                        'perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px)'; });
+            });
+            document.querySelectorAll('.magnetic-wrap').forEach(w => {
+                const b = w.querySelector('button');
+                w.addEventListener('mousemove', e => { const r = w.getBoundingClientRect(),
+                        cx = r.left + r.width / 2,
+                        cy = r.top + r.height / 2,
+                        dx = e.clientX - cx,
+                        dy = e.clientY - cy,
+                        d = Math.sqrt(dx * dx + dy * dy); if (d < 150) { const f = (1 - d / 150) * 10,
+                            a = Math.atan2(dy, dx);
+                        b.style.transform =
+                            `translate(${Math.cos(a)*f}px, ${Math.sin(a)*f}px) scale(1.04)`; } else { b.style
+                                .transform = 'translate(0,0) scale(1)'; } });
+                w.addEventListener('mouseleave', () => { b.style.transform = 'translate(0,0) scale(1)'; });
+            });
+        }
+
+        // COUNTERS (unchanged)
+        (function() {
+            document.querySelectorAll('.stat-counter').forEach(c => {
+                new IntersectionObserver(e => {
+                    e.forEach(entry => {
+                        if (entry.isIntersecting) { const el = entry.target,
+                                t = parseInt(el.dataset.target),
+                                s = Math.max(1, Math.floor(t / 50));
+                            let cur = 0;
+                            const i = setInterval(() => { cur += s; if (cur >= t) { cur = t;
+                                    clearInterval(i); }
+                                el.textContent = cur; }, 30);
+                            observer.unobserve(el); }
+                    });
+                }, { threshold: 0.3 }).observe(c);
             });
         })();
 
-        /* ========================================================
-           4. MAGNETIC BUTTONS
-           ======================================================== */
-        (function initMagnetic() {
-            document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
-                const btn = wrap.querySelector('button');
-                wrap.addEventListener('mousemove', e => {
-                    const rect = wrap.getBoundingClientRect();
-                    const cx = rect.left + rect.width / 2,
-                        cy = rect.top + rect.height / 2;
-                    const dx = e.clientX - cx,
-                        dy = e.clientY - cy;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const maxDist = 150;
-                    if (dist < maxDist) {
-                        const force = (1 - dist / maxDist) * 10;
-                        const angle = Math.atan2(dy, dx);
-                        const moveX = Math.cos(angle) * force;
-                        const moveY = Math.sin(angle) * force;
-                        btn.style.transform = `translate(${moveX}px, ${moveY}px) scale(1.04)`;
-                    } else {
-                        btn.style.transform = 'translate(0,0) scale(1)';
-                    }
-                });
-                wrap.addEventListener('mouseleave', () => {
-                    btn.style.transform = 'translate(0,0) scale(1)';
-                });
-            });
-        })();
-
-        /* ========================================================
-           5. ANIMATED COUNTERS
-           ======================================================== */
-        (function initCounters() {
-            const counters = document.querySelectorAll('.stat-counter');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const el = entry.target;
-                        const target = parseInt(el.dataset.target);
-                        let current = 0;
-                        const step = Math.max(1, Math.floor(target / 50));
-                        const interval = setInterval(() => {
-                            current += step;
-                            if (current >= target) { current = target;
-                                clearInterval(interval); }
-                            el.textContent = current;
-                        }, 30);
-                        observer.unobserve(el);
-                    }
-                });
-            }, { threshold: 0.3 });
-            counters.forEach(c => observer.observe(c));
-        })();
-
-        /* ========================================================
-           6. THEME / WALLPAPER
-           ======================================================== */
+        // THEME (unchanged)
         const themes = {
             obsidian: { accent: '#8b5cf6', bg: '#030305', spheres: ['#8b5cf6', '#06b6d4', '#ec4899'] },
             cyberpunk: { accent: '#f43f5e', bg: '#09020e', spheres: ['#f43f5e', '#d946ef', '#3b82f6'] },
@@ -1871,20 +801,17 @@
         };
 
         function applyWallpaperTheme(key) {
-            const theme = themes[key];
-            if (!theme) return;
-            document.documentElement.style.setProperty('--accent', theme.accent);
-            document.documentElement.style.setProperty('--bg-base', theme.bg);
-            const hex2rgba = (hex, a = 0.35) => {
-                const [r, g, b] = hex.match(/\w\w/g).map(x => parseInt(x, 16));
-                return `rgba(${r},${g},${b},${a})`;
-            };
-            document.documentElement.style.setProperty('--accent-glow', hex2rgba(theme.accent, 0.35));
-            document.querySelector('.sphere-1').style.background = theme.spheres[0];
-            document.querySelector('.sphere-2').style.background = theme.spheres[1];
-            document.querySelector('.sphere-3').style.background = theme.spheres[2];
-            document.getElementById('set-accent').value = theme.accent;
-            document.getElementById('accent-hex').textContent = theme.accent.toUpperCase();
+            const t = themes[key];
+            if (!t) return;
+            document.documentElement.style.setProperty('--accent', t.accent);
+            document.documentElement.style.setProperty('--bg-base', t.bg);
+            const h2r = (hex, a = 0.35) => { const [r, g, b] = hex.match(/\w\w/g).map(x => parseInt(x, 16)); return `rgba(${r},${g},${b},${a})`; };
+            document.documentElement.style.setProperty('--accent-glow', h2r(t.accent, 0.35));
+            document.querySelector('.sphere-1').style.background = t.spheres[0];
+            document.querySelector('.sphere-2').style.background = t.spheres[1];
+            document.querySelector('.sphere-3').style.background = t.spheres[2];
+            document.getElementById('set-accent').value = t.accent;
+            document.getElementById('accent-hex').textContent = t.accent.toUpperCase();
             localStorage.setItem('novaos-theme', key);
             showToast(`Theme: ${key}`, 'fa-palette');
         }
@@ -1892,45 +819,38 @@
             const c = e.target.value;
             document.documentElement.style.setProperty('--accent', c);
             document.getElementById('accent-hex').textContent = c.toUpperCase();
-            const hex2rgba = (hex, a = 0.35) => {
-                const [r, g, b] = hex.match(/\w\w/g).map(x => parseInt(x, 16));
-                return `rgba(${r},${g},${b},${a})`;
-            };
-            document.documentElement.style.setProperty('--accent-glow', hex2rgba(c, 0.35));
+            const h2r = (hex, a = 0.35) => { const [r, g, b] = hex.match(/\w\w/g).map(x => parseInt(x, 16)); return `rgba(${r},${g},${b},${a})`; };
+            document.documentElement.style.setProperty('--accent-glow', h2r(c, 0.35));
         });
 
-        /* ========================================================
-           7. SCROLL REVEAL + PERSPECTIVE
-           ======================================================== */
+        // SCROLL (RAF throttled)
+        let scrollTimeout = null;
         window.addEventListener('scroll', () => {
-            const scrolled = window.scrollY,
-                threshold = 550,
-                factor = Math.min(1, scrolled / threshold);
-            const heroContent = document.getElementById('hero-content');
-            const heroPreview = document.getElementById('hero-preview');
-            if (heroContent) { heroContent.style.transform = `translateY(${scrolled*0.15}px)`;
-                heroContent.style.opacity = Math.max(0, 1 - (scrolled / 380)); }
-            if (heroPreview) { heroPreview.style.transform =
-                    `translateY(${scrolled*0.12}px) scale(${1-(scrolled*0.0003)})`;
-                heroPreview.style.opacity = Math.max(0, 1 - (scrolled / 480)); }
-            const deck = document.querySelector('.perspective-card');
-            if (deck) {
-                const rx = 6 * (1 - factor),
-                    ry = -2 * (1 - factor),
-                    scale = 0.96 + 0.04 * factor;
-                deck.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`;
-            }
-            document.querySelectorAll('.reveal-item').forEach(item => {
-                const rect = item.getBoundingClientRect();
-                if (rect.top < window.innerHeight * 0.85) item.classList.add('revealed');
+            if (scrollTimeout) return;
+            scrollTimeout = requestAnimationFrame(() => {
+                const scrolled = window.scrollY,
+                    threshold = 550,
+                    factor = Math.min(1, scrolled / threshold);
+                const hc = document.getElementById('hero-content'),
+                    hp = document.getElementById('hero-preview');
+                if (hc) { hc.style.transform = `translateY(${scrolled*0.15}px)`;
+                    hc.style.opacity = Math.max(0, 1 - (scrolled / 380)); }
+                if (hp) { hp.style.transform = `translateY(${scrolled*0.12}px) scale(${1-(scrolled*0.0003)})`;
+                    hp.style.opacity = Math.max(0, 1 - (scrolled / 480)); }
+                const deck = document.querySelector('.perspective-card');
+                if (deck && window.innerWidth > 460) { const rx = 6 * (1 - factor),
+                        ry = -2 * (1 - factor),
+                        scale = 0.96 + 0.04 * factor;
+                    deck.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`; }
+                document.querySelectorAll('.reveal-item').forEach(i => { if (i.getBoundingClientRect().top < window
+                        .innerHeight * 0.85) i.classList.add('revealed'); });
+                scrollTimeout = null;
             });
-        });
+        }, { passive: true });
 
-        /* ========================================================
-           8. NOTCH SEARCH
-           ======================================================== */
-        const notchSearch = document.getElementById('notch-search');
-        const searchRes = document.getElementById('search-results');
+        // NOTCH SEARCH (unchanged)
+        const notchSearch = document.getElementById('notch-search'),
+            searchRes = document.getElementById('search-results');
         const searchMap = [
             { name: 'Media Engine Streamer', icon: 'fa-music', target: 'media-deck' },
             { name: 'Nova AI Assistant Chat', icon: 'fa-robot', target: 'ai-chat' },
@@ -1944,22 +864,52 @@
         notchSearch.addEventListener('input', e => {
             const q = e.target.value.toLowerCase().trim();
             if (!q) { searchRes.classList.add('hidden'); return; }
-            const matches = searchMap.filter(item => item.name.toLowerCase().includes(q));
+            const matches = searchMap.filter(i => i.name.toLowerCase().includes(q));
             if (matches.length) {
                 searchRes.innerHTML = matches.map(m =>
                     `<div onclick="scrollToSection('${m.target}');searchRes.classList.add('hidden');notchSearch.value='';" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/10 transition text-xs text-slate-200 cursor-pointer font-medium"><i class="fa-solid ${m.icon} text-[var(--accent)] w-5 text-center"></i><span>${m.name}</span></div>`
                 ).join('');
-            } else {
-                searchRes.innerHTML =
-                    `<div class="p-2.5 text-xs text-slate-500 text-center font-medium">No results found</div>`;
-            }
+            } else { searchRes.innerHTML =
+                    `<div class="p-2.5 text-xs text-slate-500 text-center font-medium">No results found</div>`; }
             searchRes.classList.remove('hidden');
         });
         document.addEventListener('click', e => { if (!e.target.closest('.notch')) searchRes.classList.add('hidden'); });
 
-        /* ========================================================
-           9. YOUTUBE MUSIC ENGINE
-           ======================================================== */
+        // ── CAROUSEL DYNAMIC GENERATION ──
+        (function buildCarousel() {
+            const items = [
+                { icon: 'fa-music', label: 'Media Engine' },
+                { icon: 'fa-robot', label: 'Nova AI' },
+                { icon: 'fa-laptop-code', label: 'Sandbox' },
+                { icon: 'fa-list-check', label: 'Task Board' },
+                { icon: 'fa-wind', label: 'Soundscapes' },
+                { icon: 'fa-stopwatch', label: 'Pomodoro' },
+                { icon: 'fa-sliders', label: 'Settings' },
+                { icon: 'fa-cloud', label: 'Weather' }
+            ];
+            const track = document.getElementById('carousel-track');
+            const isMobile = window.innerWidth <= 460;
+            const z = isMobile ? 100 : 240;
+            const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+
+            track.innerHTML = items.map((item, i) =>
+                `<div class="carousel-item" style="transform:rotateY(${angles[i]}deg) translateZ(${z}px);"><i class="fa-solid ${item.icon}"></i><span>${item.label}</span></div>`
+            ).join('');
+
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    const mobile = window.innerWidth <= 460;
+                    const newZ = mobile ? 100 : 240;
+                    document.querySelectorAll('.carousel-item').forEach((el, idx) => {
+                        el.style.transform = `rotateY(${angles[idx]}deg) translateZ(${newZ}px)`;
+                    });
+                }, 200);
+            });
+        })();
+
+        // ── YOUTUBE MUSIC ENGINE (unchanged) ──
         let ytPlayer = null,
             isYtReady = false,
             queue = [],
@@ -2029,7 +979,7 @@
             if (!q) { showToast('Enter a search term', 'fa-magnifying-glass'); return; }
             const box = document.getElementById('music-search-results');
             box.innerHTML =
-                '<div class="p-4 text-xs text-slate-400 text-center"><i class="fa-solid fa-circle-notch fa-spin mr-1 text-[var(--accent)]"></i> Searching...</div>';
+            '<div class="p-4 text-xs text-slate-400 text-center"><i class="fa-solid fa-circle-notch fa-spin mr-1 text-[var(--accent)]"></i> Searching...</div>';
             box.classList.remove('hidden');
             try {
                 const res = await fetch(`${apiBaseUrl}/search?q=${encodeURIComponent(q)}`);
@@ -2066,7 +1016,6 @@
                 document.getElementById('music-search-results').classList.add('hidden');
                 document.getElementById('music-search').value = ''; }
         }
-
         const curatedPlaylists = {
             phonk: [{ title: 'METAMORPHOSIS', artist: 'INTERWORLD', videoId: 'W3a_A9RszgU', duration: '2:23', thumbnail: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=80&h=80' }, { title: 'RAVE',
                 artist: 'Dxrk', videoId: 'hM6gN1324gA', duration: '2:49', thumbnail: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=80&h=80' }, { title: 'Close Eyes', artist: 'DVRST',
@@ -2094,7 +1043,8 @@
         }
 
         function enqueueAndPlay(song) {
-            const idx = queue.findIndex(q => q.videoId === song.videoId && (!song.isFallback || q.previewUrl === song.previewUrl));
+            const idx = queue.findIndex(q => q.videoId === song.videoId && (!song.isFallback || q.previewUrl === song
+                .previewUrl));
             if (idx !== -1) currentQueueIdx = idx;
             else { queue.push(song);
                 currentQueueIdx = queue.length - 1; }
@@ -2167,7 +1117,6 @@
 
         function selectQueueIndex(idx) { currentQueueIdx = idx;
             playTrack(queue[idx]); }
-
         const progressSlider = document.getElementById('music-slider');
         progressSlider.addEventListener('input', e => {
             if (isLocalAudioActive) { const d = localAudioPlayer.duration; if (d > 0) localAudioPlayer.currentTime = (e
@@ -2191,7 +1140,6 @@
         }
 
         function stopProgressUpdater() { if (updateProgressInterval) clearInterval(updateProgressInterval); }
-
         document.getElementById('music-volume').addEventListener('input', e => {
             const v = e.target.value;
             localAudioPlayer.volume = v / 100;
@@ -2216,9 +1164,7 @@
                     ytPlayer.setVolume(80); } }
         }
 
-        /* ========================================================
-           10. PIP DRAGGABLE
-           ======================================================== */
+        // PIP
         const pipScreen = document.getElementById('video-pip');
         let isPipMin = false;
 
@@ -2271,9 +1217,7 @@
             (handle || elmnt).ontouchstart = dragStart;
         }
 
-        /* ========================================================
-           11. NOVA AI
-           ======================================================== */
+        // NOVA AI
         const chatWindow = document.getElementById('ai-chat-window');
         const aiInput = document.getElementById('ai-input');
         const aiForm = document.getElementById('ai-form');
@@ -2287,7 +1231,7 @@
             chatWindow.appendChild(div);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
-        appendMessage('system', 'Welcome, User. Nova v4.0 Core Engine is active.');
+        appendMessage('system', 'Welcome, Prashant. Nova v4.0 Core Engine is active.');
 
         async function sendNovaMessage(prompt) {
             const val = prompt.trim();
@@ -2317,9 +1261,7 @@
         aiForm.addEventListener('submit', e => { e.preventDefault();
             sendNovaMessage(aiInput.value); });
 
-        /* ========================================================
-           12. SANDBOX
-           ======================================================== */
+        // SANDBOX
         const sandboxTabs = document.querySelectorAll('.sandbox-tab-btn');
         const sandboxTextareas = {
             html: document.getElementById('sandbox-html'),
@@ -2380,9 +1322,7 @@
 
         function clearSandboxLogs() { document.getElementById('sandbox-console-logs').innerHTML = ''; }
 
-        /* ========================================================
-           13. TASK BOARD
-           ======================================================== */
+        // TASK BOARD
         let tasks = [];
 
         function loadTasks() {
@@ -2449,9 +1389,7 @@
             renderTasks();
             showToast('Task removed', 'fa-trash'); }
 
-        /* ========================================================
-           14. SOUNDSCAPES
-           ======================================================== */
+        // SOUNDSCAPES
         const soundscapes = {
             rain: { url: 'https://www.soundjay.com/nature/sounds/rain-07.mp3', audio: null, playing: false },
             forest: { url: 'https://www.soundjay.com/nature/sounds/forest-wind-1.mp3', audio: null, playing: false },
@@ -2486,9 +1424,7 @@
             });
         });
 
-        /* ========================================================
-           15. WEATHER
-           ======================================================== */
+        // WEATHER
         async function fetchWeather(city) {
             try {
                 const res = await fetch(`${apiBaseUrl}/weather?city=${encodeURIComponent(city)}`);
@@ -2515,9 +1451,7 @@
                 e.target.value = ''; }
         });
 
-        /* ========================================================
-           16. POMODORO TIMER
-           ======================================================== */
+        // POMODORO
         let timerInterval = null,
             timerSeconds = 25 * 60,
             timerRunning = false;
@@ -2556,30 +1490,24 @@
             btnTimerStart.className = 'btn-accent px-6 py-2 rounded-full font-semibold text-xs w-24';
             updateTimerVisuals(); });
 
-        /* ========================================================
-           17. MINI‑GAMES
-           ======================================================== */
-        // ─── 17a. SPACE ELEVATOR ───
+        // MINI-GAMES (unchanged logic from previous)
         (function elevator() {
             let height = 0;
             const maxHeight = 500;
-            const stack = document.getElementById('tower-stack');
-            const display = document.getElementById('elevator-height');
-            const progress = document.getElementById('elevator-progress');
-            const message = document.getElementById('elevator-message');
-            const btn = document.getElementById('elevator-btn');
+            const stack = document.getElementById('tower-stack'),
+                display = document.getElementById('elevator-height'),
+                progress = document.getElementById('elevator-progress'),
+                message = document.getElementById('elevator-message'),
+                btn = document.getElementById('elevator-btn');
 
             function updateUI() {
                 display.textContent = height + 'm';
                 const pct = Math.min(100, (height / maxHeight) * 100);
                 progress.style.width = pct + '%';
-                if (height >= maxHeight) {
-                    message.textContent = '🚀 Reached space! You won!';
+                if (height >= maxHeight) { message.textContent = '🚀 Reached space! You won!';
                     btn.disabled = true;
-                    btn.style.opacity = '0.5';
-                } else {
-                    message.textContent = height > 100 ? 'Keep going! Almost there!' : 'Click to build toward space!';
-                }
+                    btn.style.opacity = '0.5'; } else { message.textContent = height > 100 ? 'Keep going! Almost there!' :
+                        'Click to build toward space!'; }
             }
 
             function addBlock() {
@@ -2589,54 +1517,40 @@
                 const block = document.createElement('div');
                 block.className = 'block';
                 stack.appendChild(block);
-                if (stack.children.length > 35) {
-                    stack.removeChild(stack.firstChild);
-                }
+                if (stack.children.length > 30) stack.removeChild(stack.firstChild);
                 updateUI();
-                // random event
-                if (Math.random() < 0.08) {
-                    height = Math.max(0, height - 10);
+                if (Math.random() < 0.08) { height = Math.max(0, height - 10);
                     message.textContent = '⚡ Solar flare! -10m';
                     setTimeout(() => { message.textContent = height >= maxHeight ? '🚀 Reached space!' :
                             'Click to build toward space!'; }, 800);
-                    updateUI();
-                }
+                    updateUI(); }
                 showToast('➕ +' + (height > 0 ? '8–20m' : ''), 'fa-rocket');
             }
-
             btn.addEventListener('click', addBlock);
             updateUI();
-            // auto-build bonus
             setInterval(() => {
-                if (height < maxHeight && Math.random() < 0.25) {
-                    height += 2;
-                    if (height > maxHeight) height = maxHeight;
-                    const block = document.createElement('div');
-                    block.className = 'block';
-                    block.style.opacity = '0.4';
-                    stack.appendChild(block);
-                    if (stack.children.length > 35) stack.removeChild(stack.firstChild);
-                    updateUI();
-                }
+                if (height < maxHeight && Math.random() < 0.25) { height += 2; if (height > maxHeight) height =
+                        maxHeight; const b = document.createElement('div');
+                    b.className = 'block';
+                    b.style.opacity = '0.4';
+                    stack.appendChild(b); if (stack.children.length > 30) stack.removeChild(stack.firstChild);
+                    updateUI(); }
             }, 4000);
         })();
 
-        // ─── 17b. ABSURD TROLLEY PROBLEM ───
         (function trolley() {
-            const scenarios = [
-                { left: 'Pull lever → save 5 kittens, but 1 giant robot is destroyed', right: 'Do nothing → 5 kittens run free, robot becomes evil' },
-                { left: 'Pull → 3 programmers get a free coffee, 1 AI model is deleted', right: 'Do nothing → AI writes poetry, programmers get no coffee' },
-                { left: 'Pull → save a bag of infinite doritos, but 1 hipster loses their vinyl', right: 'Do nothing → doritos vanish, vinyl becomes a meme' },
-                { left: 'Pull → 10 students get extra credit, 1 professor gets a bad review', right: 'Do nothing → students riot, professor becomes a rockstar' },
-                { left: 'Pull → save a puppy, but 1 cat gains sentience', right: 'Do nothing → puppy becomes a cat, cat becomes a dog' },
-                { left: 'Pull → all phones get 100% battery, 1 smart speaker goes rogue', right: 'Do nothing → phones die, speaker becomes a DJ' },
-            ];
+            const scenarios = [{ left: 'Pull lever → save 5 kittens, but 1 giant robot is destroyed', right: 'Do nothing → 5 kittens run free, robot becomes evil' }, { left: 'Pull → 3 programmers get a free coffee, 1 AI model is deleted',
+                right: 'Do nothing → AI writes poetry, programmers get no coffee' }, { left: 'Pull → save a bag of infinite doritos, but 1 hipster loses their vinyl',
+                right: 'Do nothing → doritos vanish, vinyl becomes a meme' }, { left: 'Pull → 10 students get extra credit, 1 professor gets a bad review',
+                right: 'Do nothing → students riot, professor becomes a rockstar' }, { left: 'Pull → save a puppy, but 1 cat gains sentience',
+                right: 'Do nothing → puppy becomes a cat, cat becomes a dog' }, { left: 'Pull → all phones get 100% battery, 1 smart speaker goes rogue',
+                right: 'Do nothing → phones die, speaker becomes a DJ' }];
             let idx = 0;
-            const scenarioEl = document.getElementById('trolley-scenario');
-            const resultEl = document.getElementById('trolley-result');
-            const nextBtn = document.getElementById('trolley-next');
-            const leftBtn = document.querySelector('.trolley-btn.left');
-            const rightBtn = document.querySelector('.trolley-btn.right');
+            const scenarioEl = document.getElementById('trolley-scenario'),
+                resultEl = document.getElementById('trolley-result'),
+                nextBtn = document.getElementById('trolley-next'),
+                leftBtn = document.querySelector('.trolley-btn.left'),
+                rightBtn = document.querySelector('.trolley-btn.right');
 
             function loadScenario(i) {
                 const s = scenarios[i % scenarios.length];
@@ -2650,74 +1564,60 @@
             function choose(choice) {
                 const s = scenarios[idx % scenarios.length];
                 let outcome;
-                if (choice === 'left') {
-                    outcome = s.left.split('→')[1]?.trim() || 'you pulled!';
+                if (choice === 'left') { outcome = s.left.split('→')[1]?.trim() || 'you pulled!';
                     resultEl.textContent = '✅ ' + outcome;
                     resultEl.className = 'game-result highlight';
-                    showToast('You pulled the lever!', 'fa-arrow-left');
-                } else {
-                    outcome = s.right.split('→')[1]?.trim() || 'you did nothing.';
+                    showToast('You pulled the lever!', 'fa-arrow-left'); } else { outcome = s.right.split('→')[1]?.trim() ||
+                        'you did nothing.';
                     resultEl.textContent = '⏸️ ' + outcome;
                     resultEl.className = 'game-result highlight';
-                    showToast('You did nothing...', 'fa-arrow-right');
-                }
+                    showToast('You did nothing...', 'fa-arrow-right'); }
                 leftBtn.disabled = true;
                 rightBtn.disabled = true;
                 setTimeout(() => { leftBtn.disabled = false;
                     rightBtn.disabled = false; }, 1200);
             }
 
-            function nextScenario() {
-                idx = (idx + 1) % scenarios.length;
+            function nextScenario() { idx = (idx + 1) % scenarios.length;
                 loadScenario(idx);
                 resultEl.textContent = 'New scenario!';
                 resultEl.className = 'game-result';
                 leftBtn.disabled = false;
-                rightBtn.disabled = false;
-            }
-
+                rightBtn.disabled = false; }
             leftBtn.addEventListener('click', () => choose('left'));
             rightBtn.addEventListener('click', () => choose('right'));
             nextBtn.addEventListener('click', nextScenario);
             loadScenario(0);
         })();
 
-        // ─── 17c. DESIGN THE NEXT IPHONE ───
         (function iphone() {
-            const grid = document.getElementById('iphone-grid');
-            const result = document.getElementById('iphone-result');
-            const submit = document.getElementById('iphone-submit');
+            const grid = document.getElementById('iphone-grid'),
+                result = document.getElementById('iphone-result'),
+                submit = document.getElementById('iphone-submit');
             const selected = { color: null, camera: null, screen: null, chip: null };
-
             grid.querySelectorAll('.feat').forEach(el => {
                 el.addEventListener('click', () => {
-                    const feat = el.dataset.feat;
-                    const val = el.dataset.value;
-                    grid.querySelectorAll(`.feat[data-feat="${feat}"]`).forEach(f => f.classList.remove('selected'));
+                    const feat = el.dataset.feat,
+                        val = el.dataset.value;
+                    grid.querySelectorAll(`.feat[data-feat="${feat}"]`).forEach(f => f.classList.remove(
+                    'selected'));
                     el.classList.add('selected');
                     selected[feat] = val;
                     const count = Object.values(selected).filter(v => v !== null).length;
-                    if (count === 4) {
-                        result.textContent = '✨ All features selected! Generate your iPhone.';
-                        result.className = 'game-result highlight';
-                    } else {
-                        result.textContent = `Pick ${4-count} more feature${4-count>1?'s':''}...`;
-                        result.className = 'game-result';
-                    }
+                    if (count === 4) { result.textContent = '✨ All features selected! Generate your iPhone.';
+                        result.className = 'game-result highlight'; } else { result.textContent =
+                            `Pick ${4-count} more feature${4-count>1?'s':''}...`;
+                        result.className = 'game-result'; }
                 });
             });
-
             submit.addEventListener('click', () => {
                 const all = Object.values(selected).every(v => v !== null);
-                if (!all) {
-                    result.textContent = '⚠️ Select one from each category!';
-                    result.className = 'game-result highlight';
-                    return;
-                }
-                const names = ['NovaPhone', 'QuantumX', 'Aether Pro', 'Photon Ultra', 'Nebula Max'];
-                const name = names[Math.floor(Math.random() * names.length)];
-                const score = Math.floor(60 + Math.random() * 40);
-                const stars = '⭐'.repeat(Math.floor(score / 20));
+                if (!all) { result.textContent = '⚠️ Select one from each category!';
+                    result.className = 'game-result highlight'; return; }
+                const names = ['NovaPhone', 'QuantumX', 'Aether Pro', 'Photon Ultra', 'Nebula Max'],
+                    name = names[Math.floor(Math.random() * names.length)],
+                    score = Math.floor(60 + Math.random() * 40),
+                    stars = '⭐'.repeat(Math.floor(score / 20));
                 result.innerHTML =
                     `📱 <strong>${name}</strong> • ${selected.color} • ${selected.camera} • ${selected.screen} • ${selected.chip} <br> <span class="text-[var(--accent)]">Score: ${score}/100 ${stars}</span>`;
                 result.className = 'game-result highlight';
@@ -2725,78 +1625,52 @@
             });
         })();
 
-        // ─── 17d. NOVA CLICKER ───
         (function clicker() {
-            let points = 0;
-            let multiplier = 1;
-            const scoreEl = document.getElementById('clicker-score');
-            const btn = document.getElementById('clicker-btn');
-            const message = document.getElementById('clicker-message');
-            const upgrades = document.querySelectorAll('.upgrade-btn');
+            let points = 0,
+                multiplier = 1;
+            const scoreEl = document.getElementById('clicker-score'),
+                btn = document.getElementById('clicker-btn'),
+                message = document.getElementById('clicker-message'),
+                upgrades = document.querySelectorAll('.upgrade-btn');
 
             function updateUI() {
                 scoreEl.textContent = points;
-                upgrades.forEach(u => {
-                    const cost = parseInt(u.dataset.cost);
-                    const mult = parseInt(u.dataset.mult);
-                    u.textContent = `×${mult} (${cost})`;
-                    u.disabled = points < cost;
-                });
+                upgrades.forEach(u => { const cost = parseInt(u.dataset.cost);
+                    u.textContent = `×${u.dataset.mult} (${cost})`;
+                    u.disabled = points < cost; });
             }
-
-            btn.addEventListener('click', () => {
-                const gain = 1 * multiplier;
+            btn.addEventListener('click', () => { const gain = 1 * multiplier;
                 points += gain;
-                if (points % 50 < 5) {
-                    message.textContent = `⚡ +${gain} Nova points!`;
-                } else {
-                    message.textContent = `⚡ +${gain}`;
-                }
+                message.textContent = points % 50 < 5 ? `⚡ +${gain} Nova points!` : `⚡ +${gain}`;
                 updateUI();
-                // micro animation
                 btn.style.transform = 'scale(0.92)';
-                setTimeout(() => { btn.style.transform = ''; }, 150);
-            });
-
+                setTimeout(() => { btn.style.transform = ''; }, 150); });
             upgrades.forEach(u => {
                 u.addEventListener('click', () => {
-                    const cost = parseInt(u.dataset.cost);
-                    const mult = parseInt(u.dataset.mult);
-                    if (points >= cost) {
-                        points -= cost;
+                    const cost = parseInt(u.dataset.cost),
+                        mult = parseInt(u.dataset.mult);
+                    if (points >= cost) { points -= cost;
                         multiplier *= mult;
                         message.textContent = `🚀 Multiplier ×${mult} active!`;
                         updateUI();
                         showToast(`×${mult} upgrade purchased!`, 'fa-bolt');
-                        // increase cost
                         u.dataset.cost = Math.floor(cost * 1.8);
-                        updateUI();
-                    } else {
-                        message.textContent = '❌ Not enough points!';
-                        setTimeout(() => { message.textContent = 'Click for Nova points!'; }, 800);
-                    }
+                        updateUI(); } else { message.textContent = '❌ Not enough points!';
+                        setTimeout(() => { message.textContent = 'Click for Nova points!'; }, 800); }
                 });
             });
-
-            // passive income
-            setInterval(() => {
-                if (points > 0) {
-                    const passive = Math.floor(points * 0.01) + 1;
+            setInterval(() => { if (points > 0) { const passive = Math.floor(points * 0.01) + 1;
                     points += passive;
-                    updateUI();
-                    if (Math.random() < 0.1) message.textContent = `💫 +${passive} passive income`;
-                }
-            }, 3000);
-
+                    updateUI(); if (Math.random() < 0.1) message.textContent = `💫 +${passive} passive income`; } },
+            3000);
             updateUI();
         })();
 
-        // ─── 17e. PASSWORD STRENGTH ───
         (function password() {
-            const input = document.getElementById('password-input');
-            const fill = document.getElementById('strength-fill');
-            const label = document.getElementById('strength-label');
-            const feedback = document.getElementById('password-feedback');
+            const input = document.getElementById('password-input'),
+                fill = document.getElementById('strength-fill'),
+                label = document.getElementById('strength-label'),
+                feedback = document.getElementById('password-feedback');
 
             function checkStrength(pwd) {
                 let score = 0;
@@ -2809,18 +1683,14 @@
                 if (pwd.length >= 15) score += 2;
                 return Math.min(10, score);
             }
-
             input.addEventListener('input', () => {
                 const pwd = input.value;
-                if (!pwd) {
-                    fill.style.width = '0%';
+                if (!pwd) { fill.style.width = '0%';
                     fill.style.background = '#94a3b8';
                     label.textContent = 'Type to check';
-                    feedback.textContent = 'Add numbers, symbols, length';
-                    return;
-                }
-                const score = checkStrength(pwd);
-                const pct = Math.min(100, score * 10);
+                    feedback.textContent = 'Add numbers, symbols, length'; return; }
+                const score = checkStrength(pwd),
+                    pct = Math.min(100, score * 10);
                 fill.style.width = pct + '%';
                 let level, color;
                 if (score < 3) { level = 'Weak';
@@ -2838,9 +1708,7 @@
             });
         })();
 
-        /* ========================================================
-           18. INIT
-           ======================================================== */
+        // INIT
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('novaos-theme') || 'obsidian';
             applyWallpaperTheme(savedTheme);
